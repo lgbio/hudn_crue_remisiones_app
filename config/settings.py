@@ -13,7 +13,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 #ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-FORCE_SCRIPT_NAME = os.getenv("FORCE_SCRIPT_NAME", None)
+#FORCE_SCRIPT_NAME = '/crue-remisiones'
+USE_X_FORWARDED_HOST = True
+CSRF_TRUSTED_ORIGINS = [
+    'http://172.20.10.250',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,7 +64,7 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'hudn_crue_remisiones_db'),
+        'NAME': os.environ.get('DB_NAME', 'crue_remisiones_db'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres2026'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
@@ -84,6 +88,9 @@ USE_TZ = True
 # Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",   # your project static folder
+]
 
 # Archivos de medios (uploads)
 MEDIA_URL = '/media/'
@@ -98,6 +105,10 @@ AUTH_USER_MODEL = 'remisiones.UsuarioCrue'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+#LOGIN_URL = 'login'
+#LOGIN_REDIRECT_URL = '/'
+#LOGOUT_REDIRECT_URL = 'login'
 
 # Email (configurar SMTP en producción)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

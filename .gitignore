@@ -10,7 +10,8 @@ __pycache__/
 .hypothesis/
 .pytest_cache
 .vscode/
-.tests/
+tests/
+static/
 env/
 .env
 
