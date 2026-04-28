@@ -12,6 +12,7 @@ __pycache__/
 .vscode/
 tests/
 static/
+staticfiles/
 env/
 .env
 

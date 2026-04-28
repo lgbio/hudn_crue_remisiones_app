@@ -22,7 +22,7 @@ from .models import Remision
 # ---------------------------------------------------------------------------
 
 COLUMNAS_ESPERADAS = [
-    'fecha', 'nombre', 'tipo_doc', 'doc', 'sexo', 'edad', 'gest',
+    'fecha', 'nombre', 'tipo_doc', 'doc', 'sexo', 'especialidad', 'edad', 'gest',
     'diagnostico', 'ta', 'fc', 'fr', 'tm', 'spo2', 'glasg', 'eps',
     'institucion_reporta', 'municipio', 'medico_refiere', 'medico_hudn',
     'radio_operador', 'observacion', 'aceptado', 'fecha_res',
@@ -487,7 +487,7 @@ def exportar_a_excel(queryset) -> BytesIO:
 
         ws.append([
             _excel_dt(r.fecha), r.nombre, r.tipo_doc, r.doc, r.sexo,
-            r.edad, r.gest, r.diagnostico, r.ta, r.fc, r.fr, r.tm, r.spo2, r.glasg,
+            r.especialidad, r.edad, r.gest, r.diagnostico, r.ta, r.fc, r.fr, r.tm, r.spo2, r.glasg,
             r.eps, r.institucion_reporta, r.municipio, r.medico_refiere, r.medico_hudn,
             r.radio_operador, r.observacion, r.aceptado, _excel_dt(r.fecha_res),
             oportunidad,
@@ -496,7 +496,7 @@ def exportar_a_excel(queryset) -> BytesIO:
     # Formato visual para columnas fecha y fecha_res
     for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
         row[0].number_format = 'DD/MM/YYYY HH:MM'   # fecha
-        row[22].number_format = 'DD/MM/YYYY HH:MM'  # fecha_res
+        row[23].number_format = 'DD/MM/YYYY HH:MM'  # fecha_res
 
     buffer = BytesIO()
     wb.save(buffer)

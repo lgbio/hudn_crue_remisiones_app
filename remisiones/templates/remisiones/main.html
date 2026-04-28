@@ -302,6 +302,10 @@
                   <span class="detalle-valor">{{ remision.diagnostico|default:"—" }}</span>
                 </div>
                 <div class="detalle-item">
+                  <span class="detalle-label">ESPECIALIDAD</span>
+                  <span class="detalle-valor">{{ remision.especialidad|default:"—" }}</span>
+                </div>
+                <div class="detalle-item">
                   <span class="detalle-label">EPS</span>
                   <span class="detalle-valor">{{ remision.eps|default:"—" }}</span>
                 </div>
@@ -471,6 +475,48 @@
                      class="form-control form-control-sm" required
                      placeholder="25 AÑOS / 3 MESES / 10 DIAS">
               <div class="invalid-feedback" id="err-edad"></div>
+            </div>
+            <!-- especialidad -->
+            <div class="col-md-3">
+              <label for="id_especialidad" class="form-label form-label-sm">ESPECIALIDAD</label>
+              <select id="id_especialidad" name="especialidad" class="form-select form-select-sm">
+                <option value="">— Seleccionar —</option>
+                <option value="CIRUGIA DE COLUMNA">Cirugía de Columna</option>
+                <option value="CIRUGIA GENERAL">Cirugía General</option>
+                <option value="CIRUGIA PLASTICA">Cirugía Plástica</option>
+                <option value="CIRUGIA DEL TORAX">Cirugía del Tórax</option>
+                <option value="CIRUGIA MAXILOFACIAL">Cirugía Maxilofacial</option>
+                <option value="CIRUGIA VASCULAR">Cirugía Vascular</option>
+                <option value="DERMATOLOGIA">Dermatología</option>
+                <option value="ENDOCRINOLOGIA">Endocrinología</option>
+                <option value="EPILEPTOLOGIA">Epileptología</option>
+                <option value="GENETICA HUMANA">Genética Humana</option>
+                <option value="GINECOLOGIA">Ginecología</option>
+                <option value="HEMATOLOGIA">Hematología</option>
+                <option value="INFECTOLOGIA">Infectología</option>
+                <option value="MEDICINA INTERNA">Medicina Interna</option>
+                <option value="NEFROLOGIA">Nefrología</option>
+                <option value="NEFROLOGIA PEDIATRICA">Nefrología Pediátrica</option>
+                <option value="NEUROCIRUGIA">Neurocirugía</option>
+                <option value="NEUROLOGIA">Neurología</option>
+                <option value="NEUROLOGIA PEDIATRICA">Neurología Pediátrica</option>
+                <option value="NUTRICION CLINICA">Nutrición Clínica</option>
+                <option value="OCULOPLASTIA">Oculoplastia</option>
+                <option value="OFTALMOLOGIA">Oftalmología</option>
+                <option value="ORTOPEDIA">Ortopedia</option>
+                <option value="OTORRINOLARINGOLOGIA">Otorrinolaringología</option>
+                <option value="PEDIATRIA">Pediatría</option>
+                <option value="PERINATOLOGIA">Perinatología</option>
+                <option value="REUMATOLOGIA">Reumatología</option>
+                <option value="TOXICOLOGIA CLINICA">Toxicología Clínica</option>
+                <option value="OTRA">Otra (escribir)</option>
+              </select>
+            </div>
+            <!-- especialidad_otra (visible solo cuando se selecciona OTRA) -->
+            <div class="col-md-3" id="especialidad_otra_container" style="display:none;">
+              <label for="id_especialidad_otra" class="form-label form-label-sm">OTRA ESPECIALIDAD</label>
+              <input type="text" id="id_especialidad_otra" class="form-control form-control-sm"
+                     placeholder="Escriba la especialidad" maxlength="100">
             </div>
          </div>
 

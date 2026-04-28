@@ -87,11 +87,94 @@ class Remision(models.Model):
         default='M',
         verbose_name='Sexo',
     )
+
+    ESPECIALIDAD_CHOICES = [
+        ('CIRUGIA DE COLUMNA', 'Cirugía de Columna'),
+        ('CIRUGIA GENERAL', 'Cirugía General'),
+        ('CIRUGIA PLASTICA', 'Cirugía Plástica'),
+        ('CIRUGIA DEL TORAX', 'Cirugía del Tórax'),
+        ('CIRUGIA MAXILOFACIAL', 'Cirugía Maxilofacial'),
+        ('CIRUGIA VASCULAR', 'Cirugía Vascular'),
+        ('DERMATOLOGIA', 'Dermatología'),
+        ('ENDOCRINOLOGIA', 'Endocrinología'),
+        ('EPILEPTOLOGIA', 'Epileptología'),
+        ('GENETICA HUMANA', 'Genética Humana'),
+        ('GINECOLOGIA', 'Ginecología'),
+        ('HEMATOLOGIA', 'Hematología'),
+        ('INFECTOLOGIA', 'Infectología'),
+        ('MEDICINA INTERNA', 'Medicina Interna'),
+        ('NEFROLOGIA', 'Nefrología'),
+        ('NEFROLOGIA PEDIATRICA', 'Nefrología Pediátrica'),
+        ('NEUROCIRUGIA', 'Neurocirugía'),
+        ('NEUROLOGIA', 'Neurología'),
+        ('NEUROLOGIA PEDIATRICA', 'Neurología Pediátrica'),
+        ('NUTRICION CLINICA', 'Nutrición Clínica'),
+        ('OCULOPLASTIA', 'Oculoplastia'),
+        ('OFTALMOLOGIA', 'Oftalmología'),
+        ('ORTOPEDIA', 'Ortopedia'),
+        ('OTORRINOLARINGOLOGIA', 'Otorrinolaringología'),
+        ('PEDIATRIA', 'Pediatría'),
+        ('PERINATOLOGIA', 'Perinatología'),
+        ('REUMATOLOGIA', 'Reumatología'),
+        ('TOXICOLOGIA CLINICA', 'Toxicología Clínica'),
+        ('OTRA', 'Otra'),
+    ]
+
+    especialidad = models.CharField(
+        max_length=50,
+        choices=ESPECIALIDAD_CHOICES,
+        blank=True,
+        default='',
+        verbose_name='Especialidad',
+        help_text='Especialidad requerida por el paciente',
+    )
+
     edad = models.CharField(
         max_length=20,
         verbose_name='Edad',
         help_text='Ej: 25 AÑOS, 3 MESES, 10 DIAS',
     )
+
+    ESPECIALIDAD_CHOICES = [
+        ('CIRUGIA DE COLUMNA', 'Cirugía de Columna'),
+        ('CIRUGIA GENERAL', 'Cirugía General'),
+        ('CIRUGIA PLASTICA', 'Cirugía Plástica'),
+        ('CIRUGIA DEL TORAX', 'Cirugía del Tórax'),
+        ('CIRUGIA MAXILOFACIAL', 'Cirugía Maxilofacial'),
+        ('CIRUGIA VASCULAR', 'Cirugía Vascular'),
+        ('DERMATOLOGIA', 'Dermatología'),
+        ('ENDOCRINOLOGIA', 'Endocrinología'),
+        ('EPILEPTOLOGIA', 'Epileptología'),
+        ('GENETICA HUMANA', 'Genética Humana'),
+        ('GINECOLOGIA', 'Ginecología'),
+        ('HEMATOLOGIA', 'Hematología'),
+        ('INFECTOLOGIA', 'Infectología'),
+        ('MEDICINA INTERNA', 'Medicina Interna'),
+        ('NEFROLOGIA', 'Nefrología'),
+        ('NEFROLOGIA PEDIATRICA', 'Nefrología Pediátrica'),
+        ('NEUROCIRUGIA', 'Neurocirugía'),
+        ('NEUROLOGIA', 'Neurología'),
+        ('NEUROLOGIA PEDIATRICA', 'Neurología Pediátrica'),
+        ('NUTRICION CLINICA', 'Nutrición Clínica'),
+        ('OCULOPLASTIA', 'Oculoplastia'),
+        ('OFTALMOLOGIA', 'Oftalmología'),
+        ('ORTOPEDIA', 'Ortopedia'),
+        ('OTORRINOLARINGOLOGIA', 'Otorrinolaringología'),
+        ('PEDIATRIA', 'Pediatría'),
+        ('PERINATOLOGIA', 'Perinatología'),
+        ('REUMATOLOGIA', 'Reumatología'),
+        ('TOXICOLOGIA CLINICA', 'Toxicología Clínica'),
+        ('OTRA', 'Otra'),
+    ]
+
+    especialidad = models.CharField(
+        max_length=100,
+        blank=True,
+        default='',
+        verbose_name='Especialidad',
+        help_text='Especialidad requerida por el paciente',
+    )
+
     # --- Información clínica ---
     diagnostico = models.TextField(
         blank=True,

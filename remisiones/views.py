@@ -222,6 +222,7 @@ def remision_detail(request, pk):
         'tipo_doc': remision.tipo_doc,
         'doc': remision.doc,
         'sexo': remision.sexo,
+        'especialidad': remision.especialidad,
         'edad': remision.edad,
         'gest': remision.gest,
         'diagnostico': remision.diagnostico,

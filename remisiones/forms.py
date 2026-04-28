@@ -54,7 +54,7 @@ class RemisionForm(forms.ModelForm):
     class Meta:
         model = Remision
         fields = [
-            'fecha', 'nombre', 'tipo_doc', 'doc', 'gest', 'sexo', 'edad',
+            'fecha', 'nombre', 'tipo_doc', 'doc', 'gest', 'sexo', 'edad', 'especialidad',
             'diagnostico', 'ta', 'fc', 'fr', 'tm', 'spo2', 'glasg',
             'eps', 'institucion_reporta', 'municipio',
             'medico_refiere', 'medico_hudn', 'radio_operador',
@@ -70,6 +70,7 @@ class RemisionForm(forms.ModelForm):
             'doc': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric'}),
             'gest': forms.Select(attrs={'class': 'form-select', 'id': 'id_gest'}),
             'sexo': forms.Select(attrs={'class': 'form-select', 'id': 'id_sexo'}),
+            'especialidad': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_especialidad'}),
             'edad': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: 25 AÑOS, 3 MESES, 10 DIAS',
@@ -114,7 +115,7 @@ class RemisionForm(forms.ModelForm):
         # fecha_res no es obligatorio
         self.fields['fecha_res'].required = False
         # Campos clínicos no obligatorios
-        for field in ['diagnostico', 'ta', 'fc', 'fr', 'tm', 'spo2', 'glasg',
+        for field in ['especialidad', 'diagnostico', 'ta', 'fc', 'fr', 'tm', 'spo2', 'glasg',
                       'eps', 'institucion_reporta', 'municipio',
                       'medico_refiere', 'medico_hudn', 'radio_operador', 'observacion']:
             self.fields[field].required = False
