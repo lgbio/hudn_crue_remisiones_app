@@ -158,7 +158,10 @@ function rellenarDefectos() {
   // Prellenar radio_operador con el nombre del usuario autenticado
   if (typeof USUARIO_NOMBRE_COMPLETO !== 'undefined' && USUARIO_NOMBRE_COMPLETO !== '') {
     const radioOperadorEl = document.getElementById('id_radio_operador');
-    if (radioOperadorEl) radioOperadorEl.value = USUARIO_NOMBRE_COMPLETO;
+    if (radioOperadorEl) {
+      radioOperadorEl.value = USUARIO_NOMBRE_COMPLETO;
+      radioOperadorEl.readOnly = true;
+    }
   }
 
   document.getElementById('modal-remision-id').value = '';
@@ -184,14 +187,19 @@ function abrirModalEdicion(id) {
       limpiarErrores();
       rellenarFormulario(data);
       document.getElementById('modal-remision-id').value = id;
-      setModoModal(data.es_editable ? 'editar' : 'ver');
+      // Editable only if record is from today AND belongs to current user
+      const canEdit = data.es_editable && data.es_propio;
+      setModoModal(canEdit ? 'editar' : 'ver');
+      // radio_operador is always read-only
+      const radioEl = document.getElementById('id_radio_operador');
+      if (radioEl) radioEl.readOnly = true;
       const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-remision'));
       modal.show();
     })
     .catch(() => alert('Error al cargar los datos del registro.'));
 }
 
-/** Abre el modal en modo clonación: copia identificación, limpia campos clínicos. */
+/** Abre el modal en modo clonación: copia TODOS los campos excepto fecha, radio_operador, aceptado, fecha_res y oportunidad. */
 function abrirModalClonacion(id) {
   const url = URLS.remisionDetalle.replace('__ID__', id);
   fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -200,7 +208,10 @@ function abrirModalClonacion(id) {
       limpiarErrores();
       rellenarDefectos();
 
-      // Copiar campos de identificación del paciente
+      // Copiar TODOS los campos del registro origen excepto:
+      // - fecha (se asigna ahora por rellenarDefectos)
+      // - radio_operador (se asigna con el usuario actual por rellenarDefectos)
+      // - aceptado, fecha_res, oportunidad (se resetean por rellenarDefectos)
       const set = (fieldId, val) => {
         const el = document.getElementById(fieldId);
         if (el) el.value = val || '';
@@ -211,24 +222,31 @@ function abrirModalClonacion(id) {
       set('id_sexo', data.sexo);
       set('id_edad', data.edad);
       set('id_gest', data.gest);
+      set('id_diagnostico', data.diagnostico);
+      set('id_ta', data.ta);
+      set('id_fc', data.fc);
+      set('id_fr', data.fr);
+      set('id_tm', data.tm);
+      set('id_spo2', data.spo2);
+      set('id_glasg', data.glasg);
       set('id_eps', data.eps);
+      set('id_institucion_reporta', data.institucion_reporta);
       set('id_municipio', data.municipio);
       set('id_medico_refiere', data.medico_refiere);
+      set('id_medico_hudn', data.medico_hudn);
+      set('id_observacion', data.observacion);
 
-      // fecha = ahora (ya establecido por rellenarDefectos)
       document.getElementById('modal-remision-id').value = '';
-
-      // Sobrescribir radio_operador con el nombre del usuario autenticado
-      if (typeof USUARIO_NOMBRE_COMPLETO !== 'undefined' && USUARIO_NOMBRE_COMPLETO !== '') {
-        const radioOperadorEl = document.getElementById('id_radio_operador');
-        if (radioOperadorEl) radioOperadorEl.value = USUARIO_NOMBRE_COMPLETO;
-      }
 
       // Aplicar lógica GEST → SEXO
       const sexoCampo = document.getElementById('id_sexo');
       if (sexoCampo) sexoCampo.disabled = (data.gest === 'SI');
 
       setModoModal('crear');
+      // radio_operador is read-only, ensure it stays disabled
+      const radioEl = document.getElementById('id_radio_operador');
+      if (radioEl) radioEl.readOnly = true;
+
       const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-remision'));
       modal.show();
     })

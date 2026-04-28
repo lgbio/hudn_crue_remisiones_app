@@ -196,6 +196,8 @@ def remision_create(request):
     if form.is_valid():
         remision = form.save(commit=False)
         remision.created_by = request.user
+        # radio_operador is always set to the creator's full name
+        remision.radio_operador = request.user.get_full_name() or request.user.username
         remision.save()
         return JsonResponse({'ok': True, 'id': remision.id})
     return JsonResponse({'ok': False, 'errors': form.errors}, status=400)
@@ -240,6 +242,7 @@ def remision_detail(request, pk):
         'fecha_res': fmt_dt(remision.fecha_res),
         'oportunidad': oportunidad,
         'es_editable': remision.es_editable,
+        'es_propio': remision.created_by == request.user,
     }
     return JsonResponse(data)
 
@@ -255,8 +258,17 @@ def remision_update(request, pk):
             status=403,
         )
 
+    # Solo el propietario del registro puede editarlo
+    if remision.created_by != request.user:
+        return JsonResponse(
+            {'ok': False, 'error': 'Solo puede modificar sus propios registros.'},
+            status=403,
+        )
+
     form = RemisionForm(request.POST, instance=remision)
     if form.is_valid():
+        # Preserve original radio_operador — it's read-only
+        form.instance.radio_operador = remision.radio_operador
         form.save()
         return JsonResponse({'ok': True})
     return JsonResponse({'ok': False, 'errors': form.errors}, status=400)
@@ -270,6 +282,13 @@ def remision_delete(request, pk):
     if not es_registro_editable(remision):
         return JsonResponse(
             {'ok': False, 'error': 'Registro histórico: no se puede eliminar.'},
+            status=403,
+        )
+
+    # Solo el propietario del registro puede eliminarlo
+    if remision.created_by != request.user:
+        return JsonResponse(
+            {'ok': False, 'error': 'Solo puede eliminar sus propios registros.'},
             status=403,
         )
 

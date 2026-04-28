@@ -27,12 +27,11 @@
 <body>
 
 		<div class="title-bar-top d-flex align-items-center justify-content-between">
-
 		  <!-- LEFT: Logo -->
-		  <div class="d-flex align-items-center">
-			<img src="{% static 'remisiones/img/logos/logo_hudn-64x64.png' %}"
+		  <div class="d-flex align-items-center" style="width:200px">
+			<img src="{% static 'remisiones/img/logos/logo_hudn-horizontal.png' %}"
 				 alt="Logo HUDN"
-				 style="width:40px; height:40px;">
+				 style="width:100%;">
 		  </div>
 
 		  <!-- CENTER: Title -->
@@ -43,16 +42,14 @@
 		  </div>
 
 		  <!-- RIGHT: Date + User -->
-		  <div class="text-end small">
+		  <div class="text-end " style="width:200px">
 			<div>{{ fecha_hoy }}</div>
 			<div>
 			  <i class="bi bi-person me-1"></i>
 			  {{ request.user.get_full_name }}
 			</div>
 		  </div>
-
 		</div>
-
 
     {% block content %}{% endblock %}
 
