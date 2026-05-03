@@ -70,7 +70,7 @@ class RemisionForm(forms.ModelForm):
             'doc': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric'}),
             'gest': forms.Select(attrs={'class': 'form-select', 'id': 'id_gest'}),
             'sexo': forms.Select(attrs={'class': 'form-select', 'id': 'id_sexo'}),
-            'especialidad': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_especialidad'}),
+            'especialidad': forms.TextInput(attrs={'class': 'form-control'}),
             'edad': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: 25 AÑOS, 3 MESES, 10 DIAS',

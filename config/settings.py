@@ -5,6 +5,8 @@ Django settings for config project.
 import os
 from pathlib import Path
 
+# settings.py (or base.py / dev.py / prod.py depending on your setup)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-fvyg4s259i8yf8+g)bsj!v)r_--bnq$8@+5v63*1u&*f)@9x(!'
@@ -83,7 +85,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
 # Archivos estáticos
 STATIC_URL = '/static/'
