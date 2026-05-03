@@ -81,20 +81,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internacionalización
+# ─── Internacionalización ────────────────────────────────────────────────────
 LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = False
 
-# Archivos estáticos
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# ─── Archivos estáticos ──────────────────────────────────────────────────────
+STATIC_URL       = '/static/'
+STATIC_ROOT      = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static",   # your project static folder
 ]
 
-# Archivos de medios (uploads)
+# ─── Archivos de medios ──────────────────────────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -103,14 +103,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = 'remisiones.UsuarioCrue'
 
-# Autenticación
+# ─── Autenticación ───────────────────────────────────────────────────────────
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
-
-#LOGIN_URL = 'login'
-#LOGIN_REDIRECT_URL = '/'
-#LOGOUT_REDIRECT_URL = 'login'
 
 # Email (configurar SMTP en producción)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
