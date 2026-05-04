@@ -299,14 +299,10 @@ def importar_desde_excel_v2 (archivo_o_path, usuario, sheet_name=None) -> dict:
 		# Create registros from dataframe
 		df = utils_lg.excelToCsv (archivo_o_path, sheet_name=sheet_name)
 		for r in df.itertuples (index=False):
-			print (f"+++ {r=}")
-			print (f"\n+++ {remFields=}")
 			rowReg = [
 				fechaHora (r[1],r[2]), *r[3:6], sel(r[6],r[7]), sel(r[8],r[9]), r[10], 
 				"OTRA", *r[11:25], sel(sel(r[25],r[26]),r[27]), fechaHora (r[28],r[29])
 			]
-			print (f"\n+++ {rowReg=}")
-
 			N = 5
 			#fieldValueDic = dict(zip(remFields[:N], rowReg [:N]))
 			fieldValueDic = dict(zip(remFields, rowReg))
