@@ -298,7 +298,6 @@ def importar_desde_excel_v2 (archivo_o_path, usuario, sheet_name=None) -> dict:
 
 		# Create registros from dataframe
 		df = utils_lg.excelToCsv (archivo_o_path, sheet_name=sheet_name)
-		df = df [454:]
 		for r in df.itertuples (index=False):
 			rowReg = [
 				fechaHora (r[1],r[2]), *r[3:6], sel(r[6],r[7]), sel(r[8],r[9]), r[10], 
