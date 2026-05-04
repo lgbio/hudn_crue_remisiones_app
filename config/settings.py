@@ -90,9 +90,7 @@ USE_TZ = False
 # ─── Archivos estáticos ──────────────────────────────────────────────────────
 STATIC_URL       = '/static/'
 STATIC_ROOT      = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",   # your project static folder
-]
+STATICFILES_DIRS = []
 
 # ─── Archivos de medios ──────────────────────────────────────────────────────
 MEDIA_URL = '/media/'

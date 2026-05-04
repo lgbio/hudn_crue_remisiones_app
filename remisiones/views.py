@@ -126,6 +126,7 @@ def main_view(request):
 	doc = request.GET.get('doc', '')
 	paginado = request.GET.get('paginado', '') == 'True'
 	page = request.GET.get('page', 1)
+	orden = request.GET.get('orden', 'desc')  # 'desc' = newest first (default)
 
 	# Valores por defecto para filtro mes
 	try:
@@ -139,13 +140,13 @@ def main_view(request):
 		anio = hoy.year
 
 	# Construir kwargs para el servicio
-	kwargs = {}
+	kwargs = {'orden': orden}
 	if filtro == 'mes':
-		kwargs = {'mes': mes, 'anio': anio}
+		kwargs.update({'mes': mes, 'anio': anio})
 	elif filtro == 'rango':
-		kwargs = {'desde': desde, 'hasta': hasta}
+		kwargs.update({'desde': desde, 'hasta': hasta})
 	elif filtro == 'documento':
-		kwargs = {'doc': doc}
+		kwargs.update({'doc': doc})
 
 	qs = obtener_remisiones(filtro, **kwargs)
 
@@ -181,6 +182,9 @@ def main_view(request):
 		'desde': desde,
 		'hasta': hasta,
 		'doc': doc,
+		'orden': orden,
+		'mes_hoy': hoy.month,
+		'anio_hoy': hoy.year,
 		'usuario_nombre_completo': request.user.get_full_name(),
 	}
 	return render(request, 'remisiones/main.html', context)

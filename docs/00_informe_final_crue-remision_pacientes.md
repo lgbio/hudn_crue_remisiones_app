@@ -170,7 +170,7 @@ flowchart LR
 ### 4.2 Estructura del Proyecto
 
 ```
-app_crue_remisiones/
+hudn_crue_remisiones_app/
 ├── config/                          # Configuración Django
 │   ├── settings.py                  # PostgreSQL, timezone America/Bogota
 │   ├── settings_test.py             # SQLite en memoria para tests
@@ -436,7 +436,7 @@ Todo lo anterior, más:
 
 ```bash
 git clone <url-del-repositorio>
-cd app_crue_remisiones
+cd hudn_crue_remisiones_app
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

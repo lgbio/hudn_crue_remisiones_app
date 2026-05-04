@@ -152,13 +152,17 @@ def validar_signo_vital_numerico(valor: str) -> bool:
 
 def obtener_remisiones(filtro: str, **kwargs):
 	"""
-	Aplica el filtro activo y retorna un QuerySet ordenado por fecha ascendente.
+	Aplica el filtro activo y retorna un QuerySet ordenado por fecha.
 
 	filtro='mes':		kwargs = {mes: int, anio: int}
 	filtro='rango':		kwargs = {desde: date, hasta: date}
 	filtro='documento': kwargs = {doc: str}
+
+	orden: 'desc' (default, newest first) or 'asc' (oldest first)
 	"""
-	qs = Remision.objects.all().order_by('fecha')
+	orden = kwargs.pop('orden', 'desc')
+	order_field = '-fecha' if orden == 'desc' else 'fecha'
+	qs = Remision.objects.all().order_by(order_field)
 
 	if filtro == 'mes':
 		mes = kwargs.get('mes')
