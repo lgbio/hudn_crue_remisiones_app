@@ -88,7 +88,10 @@
             <input type="file" name="archivo" id="id_archivo_importar"
                    class="form-control form-control-sm mb-1"
                    accept=".xlsx,.xls">
-            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+            <select name="sheet_name" id="id_sheet_selector"
+                    class="form-select form-select-sm mb-1" style="display:none;">
+            </select>
+            <button type="submit" class="btn btn-outline-primary btn-sm w-100" id="btn-importar-submit">
               <i class="bi bi-cloud-upload me-1"></i>Importar Excel
             </button>
           </div>

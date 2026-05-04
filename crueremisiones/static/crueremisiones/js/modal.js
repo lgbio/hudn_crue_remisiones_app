@@ -508,13 +508,59 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Importar Excel — manejar respuesta AJAX
+  // Importar Excel — sheet selection and AJAX import
   const formImportar = document.getElementById('form-importar');
+  const fileInput = document.getElementById('id_archivo_importar');
+  const sheetSelector = document.getElementById('id_sheet_selector');
+  const resultadoDiv = document.getElementById('importar-resultado');
+
+  // When file is selected, fetch sheet names
+  if (fileInput && sheetSelector) {
+    fileInput.addEventListener('change', function () {
+      // Reset sheet selector
+      sheetSelector.style.display = 'none';
+      sheetSelector.innerHTML = '';
+      if (resultadoDiv) { resultadoDiv.textContent = ''; resultadoDiv.className = 'mt-1 small sidebar-text sidebar-sub-content'; }
+
+      if (!this.files || !this.files[0]) return;
+
+      const formData = new FormData();
+      formData.append('archivo', this.files[0]);
+      formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
+
+      fetch('/importar/excel/hojas/', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData,
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok && data.hojas && data.hojas.length > 1) {
+            // Multiple sheets — show selector
+            sheetSelector.innerHTML = '';
+            data.hojas.forEach(function (nombre) {
+              const opt = document.createElement('option');
+              opt.value = nombre;
+              opt.textContent = nombre;
+              sheetSelector.appendChild(opt);
+            });
+            sheetSelector.style.display = '';
+          } else {
+            // Single sheet or error — hide selector
+            sheetSelector.style.display = 'none';
+          }
+        })
+        .catch(() => {
+          sheetSelector.style.display = 'none';
+        });
+    });
+  }
+
+  // Handle import form submit
   if (formImportar) {
     formImportar.addEventListener('submit', function (e) {
       e.preventDefault();
       const formData = new FormData(this);
-      const resultadoDiv = document.getElementById('importar-resultado');
 
       fetch(this.action, {
         method: 'POST',

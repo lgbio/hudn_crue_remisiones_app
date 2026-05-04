@@ -275,7 +275,7 @@ def enviar_email_recuperacion(usuario, password_temp: str) -> None:
 ## 3.5 — Importación desde Excel
 ## ---------------------------------------------------------------------------
 
-def importar_desde_excel_v2 (archivo_o_path, usuario) -> dict:
+def importar_desde_excel_v2 (archivo_o_path, usuario, sheet_name=None) -> dict:
 	from . import utils_lg
 	import tempfile
 	import os
@@ -297,7 +297,7 @@ def importar_desde_excel_v2 (archivo_o_path, usuario) -> dict:
 			excel_path = str(archivo_o_path)
 
 		# Create registros from dataframe
-		df = utils_lg.excelToCsv (archivo_o_path)
+		df = utils_lg.excelToCsv (archivo_o_path, sheet_name=sheet_name)
 		for r in df.itertuples (index=False):
 			print (f"+++ {r=}")
 			print (f"\n+++ {remFields=}")

@@ -360,19 +360,48 @@ def importar_excel(request):
 	form = ImportarExcelForm(request.POST, request.FILES)
 	if form.is_valid():
 		archivo = form.cleaned_data['archivo']
+		sheet_name = request.POST.get('sheet_name', None)
 		# Save to temp file for excelToDataframe (needs a path)
 		with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
 			for chunk in archivo.chunks():
 				tmp.write(chunk)
 			temp_path = tmp.name
 		try:
-			resultado = importar_desde_excel_v2(temp_path, request.user)
+			resultado = importar_desde_excel_v2(temp_path, request.user, sheet_name=sheet_name)
 		finally:
 			if os.path.exists(temp_path):
 				os.unlink(temp_path)
 		status_code = 200 if resultado.get('ok') else 400
 		return JsonResponse(resultado, status=status_code)
 	return JsonResponse({'ok': False, 'errors': form.errors}, status=400)
+
+
+@login_required
+def importar_excel_hojas(request):
+	"""POST /importar/excel/hojas/ — Retorna la lista de hojas del archivo Excel."""
+	import tempfile
+	import os
+	import openpyxl
+
+	if 'archivo' not in request.FILES:
+		return JsonResponse({'ok': False, 'error': 'No se envió archivo.'}, status=400)
+
+	archivo = request.FILES['archivo']
+	with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
+		for chunk in archivo.chunks():
+			tmp.write(chunk)
+		temp_path = tmp.name
+
+	try:
+		wb = openpyxl.load_workbook(temp_path, read_only=True, data_only=True)
+		hojas = wb.sheetnames
+		wb.close()
+		return JsonResponse({'ok': True, 'hojas': hojas})
+	except Exception as e:
+		return JsonResponse({'ok': False, 'error': f'No se pudo leer el archivo: {e}'}, status=400)
+	finally:
+		if os.path.exists(temp_path):
+			os.unlink(temp_path)
 
 
 # ---------------------------------------------------------------------------

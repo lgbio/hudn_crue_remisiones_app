@@ -74,10 +74,10 @@ def main ():
 
 #--------------------------------------------------------------------
 #--------------------------------------------------------------------
-def excelToCsv (input_path: str, output_path: str = None):
+def excelToCsv (input_path: str, output_path: str = None, sheet_name=None):
 	import os
 	try:
-		df   = excel_to_clean_df (input_path)
+		df   = excel_to_clean_df (input_path, sheet_name=sheet_name)
 		row  = None
 		rows = []   # Rows for dataframe
 		output_path = os.path.basename (input_path.split (".")[0] + ".csv")
@@ -114,17 +114,21 @@ def excelToCsv (input_path: str, output_path: str = None):
 
 #--------------------------------------------------------------------
 #--------------------------------------------------------------------
-def excel_to_clean_df (input_path: str) -> pd.DataFrame:
+def excel_to_clean_df (input_path: str, sheet_name=None) -> pd.DataFrame:
 	"""
 	Reads Excel starting from row 11 and applies fixed headers.
 	Returns a cleaned DataFrame.
+	If sheet_name is provided, reads that specific sheet; otherwise reads the first sheet.
 	"""
-	df = pd.read_excel (
-		input_path,
-		skiprows=10,   # skip first 10 rows → start at row 11
-		header=None,   # ignore original headers
-		dtype=str	   # avoid type issues
-	)
+	kwargs = {
+		'skiprows': 10,
+		'header': None,
+		'dtype': str,
+	}
+	if sheet_name:
+		kwargs['sheet_name'] = sheet_name
+
+	df = pd.read_excel (input_path, **kwargs)
 
 	# Trim to expected number of columns
 	df = df.iloc[:, :len (HEADERS)]
