@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'remisiones',
+    'crueremisiones',
 ]
 
 MIDDLEWARE = [
@@ -99,7 +99,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'remisiones.UsuarioCrue'
+AUTH_USER_MODEL = 'crueremisiones.Usuario'
 
 # ─── Autenticación ───────────────────────────────────────────────────────────
 LOGIN_URL = '/login/'

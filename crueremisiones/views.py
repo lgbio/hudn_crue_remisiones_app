@@ -26,7 +26,7 @@ from .forms import (
 	UsuarioEditForm,
 	UsuarioForm,
 )
-from .models import Remision, UsuarioCrue
+from .models import Remision, Usuario
 from .services import (
 	calcular_oportunidad,
 	enviar_email_recuperacion,
@@ -70,7 +70,7 @@ def login_view(request):
 		else:
 			error = 'Usuario o contraseña incorrectos.'
 
-	return render(request, 'remisiones/login.html', {'form': form, 'error': error})
+	return render(request, 'crueremisiones/login.html', {'form': form, 'error': error})
 
 
 def logout_view(request):
@@ -87,12 +87,12 @@ def recuperar_password_view(request):
 	if request.method == 'POST' and form.is_valid():
 		username = form.cleaned_data['username']
 		try:
-			user = UsuarioCrue.objects.get(username=username)
+			user = Usuario.objects.get(username=username)
 			password_temp = generar_password_temporal()
 			user.set_password(password_temp)
 			user.save()
 			enviar_email_recuperacion(user, password_temp)
-		except UsuarioCrue.DoesNotExist:
+		except Usuario.DoesNotExist:
 			pass  # No revelar si el usuario existe o no (seguridad)
 		# Siempre mostrar mensaje genérico
 		mensaje = (
@@ -102,7 +102,7 @@ def recuperar_password_view(request):
 
 	return render(
 		request,
-		'remisiones/recuperar_password.html',
+		'crueremisiones/recuperar_password.html',
 		{'form': form, 'mensaje': mensaje},
 	)
 
@@ -187,7 +187,7 @@ def main_view(request):
 		'anio_hoy': hoy.year,
 		'usuario_nombre_completo': request.user.get_full_name(),
 	}
-	return render(request, 'remisiones/main.html', context)
+	return render(request, 'crueremisiones/main.html', context)
 
 
 # ---------------------------------------------------------------------------
@@ -386,14 +386,14 @@ def usuarios_view(request):
 		messages.error(request, 'No tiene permisos para acceder a esta sección.')
 		return redirect('/')
 
-	usuarios = UsuarioCrue.objects.all().order_by('username')
+	usuarios = Usuario.objects.all().order_by('username')
 	form = UsuarioForm(request.POST or None)
 	error = None
 
 	if request.method == 'POST':
 		if form.is_valid():
 			data = form.cleaned_data
-			user = UsuarioCrue.objects.create_user(
+			user = Usuario.objects.create_user(
 				username=data['username'],
 				password=data['password'],
 				first_name=data['first_name'],
@@ -409,7 +409,7 @@ def usuarios_view(request):
 
 	return render(
 		request,
-		'remisiones/usuarios.html',
+		'crueremisiones/usuarios.html',
 		{'usuarios': usuarios, 'form': form, 'error': error},
 	)
 
@@ -429,7 +429,7 @@ def usuario_delete(request, pk):
 			status=400,
 		)
 
-	user = get_object_or_404(UsuarioCrue, pk=pk)
+	user = get_object_or_404(Usuario, pk=pk)
 	user.delete()
 	return JsonResponse({'ok': True})
 
@@ -441,7 +441,7 @@ def usuario_edit(request, pk):
 		messages.error(request, 'No tiene permisos para esta acción.')
 		return redirect('/')
 
-	user = get_object_or_404(UsuarioCrue, pk=pk)
+	user = get_object_or_404(Usuario, pk=pk)
 
 	if request.method == 'POST':
 		form = UsuarioEditForm(request.POST)
@@ -462,7 +462,7 @@ def usuario_edit(request, pk):
 			'rol': user.rol,
 		})
 
-	return render(request, 'remisiones/usuario_editar.html', {
+	return render(request, 'crueremisiones/usuario_editar.html', {
 		'form': form,
 		'usuario_editado': user,
 	})
@@ -475,7 +475,7 @@ def usuario_cambiar_password(request, pk):
 		messages.error(request, 'No tiene permisos para esta acción.')
 		return redirect('/')
 
-	user = get_object_or_404(UsuarioCrue, pk=pk)
+	user = get_object_or_404(Usuario, pk=pk)
 
 	if request.method == 'POST':
 		form = AdminCambiarPasswordForm(request.POST)
@@ -487,7 +487,7 @@ def usuario_cambiar_password(request, pk):
 	else:
 		form = AdminCambiarPasswordForm()
 
-	return render(request, 'remisiones/usuario_cambiar_password.html', {
+	return render(request, 'crueremisiones/usuario_cambiar_password.html', {
 		'form': form,
 		'usuario_editado': user,
 	})
@@ -515,6 +515,6 @@ def cambiar_password_view(request):
 
 	return render(
 		request,
-		'remisiones/cambiar_password.html',
+		'crueremisiones/cambiar_password.html',
 		{'form': form, 'error': error, 'exito': exito},
 	)

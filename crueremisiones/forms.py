@@ -3,7 +3,7 @@ Formularios Django para la aplicación CRUE Remisiones Pacientes.
 """
 from django import forms
 
-from .models import Remision, UsuarioCrue
+from .models import Remision, Usuario
 from .services import validar_edad, validar_glasg, validar_ta
 
 
@@ -202,19 +202,19 @@ class UsuarioForm(forms.Form):
     )
     rol = forms.ChoiceField(
         label='Rol',
-        choices=UsuarioCrue.ROL_CHOICES,
+        choices=Usuario.ROL_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
 
     def clean_username(self):
         username = self.cleaned_data['username'].strip()
-        if UsuarioCrue.objects.filter(username=username).exists():
+        if Usuario.objects.filter(username=username).exists():
             raise forms.ValidationError('Ya existe un usuario con ese nombre de usuario.')
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip()
-        if UsuarioCrue.objects.filter(email=email).exists():
+        if Usuario.objects.filter(email=email).exists():
             raise forms.ValidationError('Ya existe un usuario con ese correo electrónico.')
         return email
 
@@ -237,7 +237,7 @@ class UsuarioEditForm(forms.Form):
     )
     rol = forms.ChoiceField(
         label='Rol',
-        choices=UsuarioCrue.ROL_CHOICES,
+        choices=Usuario.ROL_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
 

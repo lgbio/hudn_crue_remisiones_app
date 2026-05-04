@@ -6,7 +6,7 @@ from django.urls import path
 
 from . import views
 
-app_name = 'remisiones'
+app_name = 'crueremisiones'
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),

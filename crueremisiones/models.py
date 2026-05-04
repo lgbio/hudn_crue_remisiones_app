@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 
-class UsuarioCrue(AbstractUser):
+class Usuario(AbstractUser):
 	"""Modelo de usuario unificado que reemplaza User + PerfilUsuario."""
 
 	ROL_CHOICES = [
@@ -20,8 +20,8 @@ class UsuarioCrue(AbstractUser):
 	)
 
 	class Meta:
-		verbose_name = 'Usuario CRUE'
-		verbose_name_plural = 'Usuarios CRUE'
+		verbose_name = 'Usuario'
+		verbose_name_plural = 'Usuarios'
 
 	def __str__(self):
 		return f'{self.username} ({self.rol})'

@@ -1,4 +1,4 @@
-{% extends "remisiones/base.html" %}
+{% extends "crueremisiones/base.html" %}
 {% load static %}
 
 {% block title %}CRUE Remisiones{% endblock %}
@@ -8,16 +8,16 @@
 <!-- LAYOUT PRINCIPAL: sidebar + contenido -->
 <div class="app-wrapper">
 
-  {% include "remisiones/sidebar.html" %}
+  {% include "crueremisiones/sidebar.html" %}
 
   <!-- CONTENIDO PRINCIPAL -->
   <div id="main-content" class="main-content">
-	{% include "remisiones/header.html" %}
+	{% include "crueremisiones/header.html" %}
 
     <!-- BARRA DE TÍTULO Y CONTROLES DE FILTRO (Tarea 13.2) -->
     <header class="title-bar">
 
-      <form id="form-filtros" method="get" action="{% url 'remisiones:main' %}" class="filtros-form">
+      <form id="form-filtros" method="get" action="{% url 'crueremisiones:main' %}" class="filtros-form">
 
         <div class="filtros-row">
           <span class="filtros-label">Ver registros:</span>
@@ -605,18 +605,18 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'remisiones/js/autoformat.js' %}"></script>
-<script src="{% static 'remisiones/js/filtros.js' %}"></script>
+<script src="{% static 'crueremisiones/js/autoformat.js' %}"></script>
+<script src="{% static 'crueremisiones/js/filtros.js' %}"></script>
 <script>
   const USUARIO_NOMBRE_COMPLETO = "{{ usuario_nombre_completo|escapejs }}";
 </script>
-<script src="{% static 'remisiones/js/datetime_widget.js' %}"></script>
-<script src="{% static 'remisiones/js/modal.js' %}"></script>
-<script src="{% static 'remisiones/js/tabla.js' %}"></script>
+<script src="{% static 'crueremisiones/js/datetime_widget.js' %}"></script>
+<script src="{% static 'crueremisiones/js/modal.js' %}"></script>
+<script src="{% static 'crueremisiones/js/tabla.js' %}"></script>
 <script>
   // Pasar URLs de Django a JavaScript
   const URLS = {
-    remisionNueva:   "{% url 'remisiones:remision_create' %}",
+    remisionNueva:   "{% url 'crueremisiones:remision_create' %}",
     remisionDetalle: "/remisiones/__ID__/detalle/",
     remisionEditar:  "/remisiones/__ID__/editar/",
     remisionEliminar:"/remisiones/__ID__/eliminar/",
