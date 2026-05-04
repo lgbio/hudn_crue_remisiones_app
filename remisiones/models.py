@@ -8,8 +8,8 @@ class UsuarioCrue(AbstractUser):
 	"""Modelo de usuario unificado que reemplaza User + PerfilUsuario."""
 
 	ROL_CHOICES = [
-		('DIRECTOR', 'Director'),
 		('RADIOOPERADOR', 'Radiooperador'),
+		('DIRECTOR', 'Director'),
 	]
 
 	rol = models.CharField(
