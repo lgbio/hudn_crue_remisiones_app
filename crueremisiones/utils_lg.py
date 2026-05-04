@@ -12,45 +12,45 @@ only the data rows to a clean CSV file.
 
 Expected sheet structure
 ------------------------
-Row  1  : Title block (col D: "REMISIONES DE USUARIOS COMENTADOS POR CRUE, ESE, SAS, EPS")
-Row  7  : Year/month label (col A: "AÑO:", col L: "MES: ")
-Row  9  : Main column headers  (31 non-None columns across A–AE)
+Row  1	: Title block (col D: "REMISIONES DE USUARIOS COMENTADOS POR CRUE, ESE, SAS, EPS")
+Row  7	: Year/month label (col A: "AÑO:", col L: "MES: ")
+Row  9	: Main column headers  (31 non-None columns across A–AE)
 Row  10 : Sub-column headers   (17 sub-headers)
 Rows 11+ : Data rows (col A is a consecutive integer row number)
 
 Column layout (1-based Excel columns → CSV header)
 ---------------------------------------------------
-Col  1  A   no
-Col  2  B   fecha
-Col  3  C   hora
-Col  4  D   nombre_paciente
-Col  5  E   tipo_documento
-Col  6  F   identificacion
-Col  7  G   gestante_si          ← sub-header "SI"  under "GESTANTE"
-Col  8  H   gestante_no          ← sub-header "NO"
-Col  9  I   sexo_m               ← sub-header "M"   under "SEXO EDAD"
-Col 10  J   sexo_f               ← sub-header "F"
-Col 11  K   edad                 ← sub-header "ED"
-Col 12  L   diagnostico
-Col 13  M   sv_ta                ← sub-header "TA"  under "SIGNOS VITALES"
-Col 14  N   sv_fc                ← sub-header "FC"
-Col 15  O   sv_fr                ← sub-header "FR"
-Col 16  P   sv_temperatura       ← sub-header "T°"
-Col 17  Q   sv_spo2              ← sub-header "SPO2"
-Col 18  R   sv_glasgow           ← sub-header "Glasgow"
-Col 19  S   eps
-Col 20  T   institucion_reporta
-Col 21  U   municipio
-Col 22  V   medico_refiere
-Col 23  W   medico_hudn_confirma
-Col 24  X   radio_operador
-Col 25  Y   observacion
-Col 26  Z   aceptado_si          ← sub-header "SI"   under "ACEPTADO"
-Col 27  AA  aceptado_no          ← sub-header "NO"
-Col 28  AB  aceptado_urg_vital   ← sub-header "URG VITAL"
-Col 29  AC  aceptado_fecha       ← sub-header "FECHA"
-Col 30  AD  aceptado_hora        ← sub-header "HORA"
-Col 31  AE  oportunidad
+Col  1	A	no
+Col  2	B	fecha
+Col  3	C	hora
+Col  4	D	nombre_paciente
+Col  5	E	tipo_documento
+Col  6	F	identificacion
+Col  7	G	gestante_si			 ← sub-header "SI"	under "GESTANTE"
+Col  8	H	gestante_no			 ← sub-header "NO"
+Col  9	I	sexo_m				 ← sub-header "M"	under "SEXO EDAD"
+Col 10	J	sexo_f				 ← sub-header "F"
+Col 11	K	edad				 ← sub-header "ED"
+Col 12	L	diagnostico
+Col 13	M	sv_ta				 ← sub-header "TA"	under "SIGNOS VITALES"
+Col 14	N	sv_fc				 ← sub-header "FC"
+Col 15	O	sv_fr				 ← sub-header "FR"
+Col 16	P	sv_temperatura		 ← sub-header "T°"
+Col 17	Q	sv_spo2				 ← sub-header "SPO2"
+Col 18	R	sv_glasgow			 ← sub-header "Glasgow"
+Col 19	S	eps
+Col 20	T	institucion_reporta
+Col 21	U	municipio
+Col 22	V	medico_refiere
+Col 23	W	medico_hudn_confirma
+Col 24	X	radio_operador
+Col 25	Y	observacion
+Col 26	Z	aceptado_si			 ← sub-header "SI"	 under "ACEPTADO"
+Col 27	AA	aceptado_no			 ← sub-header "NO"
+Col 28	AB	aceptado_urg_vital	 ← sub-header "URG VITAL"
+Col 29	AC	aceptado_fecha		 ← sub-header "FECHA"
+Col 30	AD	aceptado_hora		 ← sub-header "HORA"
+Col 31	AE	oportunidad
 """
 
 HEADERS = [
@@ -77,26 +77,26 @@ def main ():
 def excelToCsv (input_path: str, output_path: str = None, sheet_name=None):
 	import os
 	try:
-		df   = excel_to_clean_df (input_path, sheet_name=sheet_name)
+		df	 = excel_to_clean_df (input_path, sheet_name=sheet_name)
 		row  = None
-		rows = []   # Rows for dataframe
+		rows = []	# Rows for dataframe
 		output_path = os.path.basename (input_path.split (".")[0] + ".csv")
 		for _, r in df.iterrows ():
 			gestSi, gestNo = getBool (r[6], r[7], "SI", "NO")
-			sexF, sexM     = getBool (r[9], r[8], "F", "M")
+			sexF, sexM	   = getBool (r[9], r[8], "F", "M")
 			acepSi, acepNo, acepUrg = getBoolTri (r[25], r[26], r[27])		 # AceptaSI
-			nombre, id     = getText (r[3]), getText (r[5])
+			nombre, id	   = getText (r[3]), getText (r[5])
 			if not nombre and not id:
 				continue
 			row = [
 				r[0],
 				getDate (r[1]), getTime (r[2]), getText (r[3]), getTipoId (r[4]), getText (r[5]),  #...tipoId, id
-				gestSi, gestNo, sexM, sexF, getText (r[10]), getText (r[11]),                      #...edad, diagnostico
+				gestSi, gestNo, sexM, sexF, getText (r[10]), getText (r[11]),					   #...edad, diagnostico
 				getRate (r[12]), getInt (r[13]), getInt (r[14]), getFloat (r[15]), getFloat (r[16]), getRate (r[17]), #...Glasgow
-				getText (r[18]), getText (r[19]), getText (r[20]),                                 #...municipo,
-				getText (r[21]), getText (r[22]), getText (r[23]), getText (r[24]),                #...observacion
-				acepSi, acepNo, acepUrg, getDate (r[28]), getTime (r[29]),                   #...fecha_res, hora_res
-				getOportunidad (r[1],r[2],r[28],r[29])                                             #...oportunidad
+				getText (r[18]), getText (r[19]), getText (r[20]),								   #...municipo,
+				getText (r[21]), getText (r[22]), getText (r[23]), getText (r[24]),				   #...observacion
+				acepSi, acepNo, acepUrg, getDate (r[28]), getTime (r[29]),					 #...fecha_res, hora_res
+				getOportunidad (r[1],r[2],r[28],r[29])											   #...oportunidad
 			]
 			rows.append (row)
 
@@ -179,6 +179,38 @@ def getDate (x):
 			return datetime.strptime (str(x), "%Y-%m-%d").date()
 		except:
 			return None
+
+
+
+#--------------------------------------------------------------------
+# Parse a date and ensure it belongs to the current year.
+# Raises:
+#	 ValueError if:
+#	 format is invalid
+#	 year is not current year
+#--------------------------------------------------------------------
+def getDate(x):
+	if not x:
+		return None
+
+	raw = str(x).strip()
+
+	# Try ISO first
+	try:
+		dt = datetime.fromisoformat(raw)
+	except Exception:
+		try:
+			dt = datetime.strptime(raw, "%Y-%m-%d")
+		except Exception:
+			raise ValueError(f"Invalid date format: {raw}")
+
+	current_year = datetime.now().year
+
+	if dt.year != current_year:
+		raise ValueError( f"Año inválido {dt.year} (esperado {current_year}) valor actual: {raw}")
+
+	return dt.date()
+
 
 def getTime (x):
 	if not x or str (x).lower() == 'nan':
