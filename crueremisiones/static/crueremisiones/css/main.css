@@ -457,6 +457,10 @@ body {
   width: 200px;
 }
 
+.filtro-doc-nombre {
+  width: 320px;
+}
+
 .filtro-check-label {
   display: flex;
   align-items: center;

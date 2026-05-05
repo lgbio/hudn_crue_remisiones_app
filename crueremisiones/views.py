@@ -33,7 +33,7 @@ from .services import (
 	es_registro_editable,
 	exportar_a_excel,
 	generar_password_temporal,
-	importar_desde_excel_v2,
+	importar_desde_excel,
 	obtener_remisiones,
 )
 
@@ -121,8 +121,6 @@ def main_view(request):
 	filtro = request.GET.get('filtro', 'mes')
 	mes = request.GET.get('mes')
 	anio = request.GET.get('anio')
-	desde = request.GET.get('desde', '')
-	hasta = request.GET.get('hasta', '')
 	doc = request.GET.get('doc', '')
 	page = request.GET.get('page', 1)
 	orden = request.GET.get('orden', 'desc')  # 'desc' = newest first (default)
@@ -145,7 +143,7 @@ def main_view(request):
 		# User explicitly set the checkbox
 		paginado = (paginado_param == 'True')
 	else:
-		# Default: paginated for past months/rango, not for current month
+		# Default: paginated for past months, not for current month
 		if es_mes_actual:
 			paginado = False
 		else:
@@ -155,8 +153,6 @@ def main_view(request):
 	kwargs = {'orden': orden}
 	if filtro == 'mes':
 		kwargs.update({'mes': mes, 'anio': anio})
-	elif filtro == 'rango':
-		kwargs.update({'desde': desde, 'hasta': hasta})
 	elif filtro == 'documento':
 		kwargs.update({'doc': doc})
 
@@ -164,7 +160,7 @@ def main_view(request):
 
 	# Paginación
 	page_obj = None
-	usar_paginacion = paginado or (filtro == 'rango' and paginado_param is None)
+	usar_paginacion = paginado
 
 	if usar_paginacion:
 		paginator = Paginator(qs, 50)
@@ -191,8 +187,6 @@ def main_view(request):
 		'meses': MESES_ES,
 		'fecha_hoy': fecha_hoy,
 		'paginado': paginado,
-		'desde': desde,
-		'hasta': hasta,
 		'doc': doc,
 		'orden': orden,
 		'mes_hoy': hoy.month,
@@ -324,8 +318,6 @@ def exportar_excel(request):
 	filtro = request.GET.get('filtro', 'mes')
 	mes = request.GET.get('mes')
 	anio = request.GET.get('anio')
-	desde = request.GET.get('desde', '')
-	hasta = request.GET.get('hasta', '')
 	doc = request.GET.get('doc', '')
 
 	try:
@@ -341,8 +333,6 @@ def exportar_excel(request):
 	kwargs = {}
 	if filtro == 'mes':
 		kwargs = {'mes': mes, 'anio': anio}
-	elif filtro == 'rango':
-		kwargs = {'desde': desde, 'hasta': hasta}
 	elif filtro == 'documento':
 		kwargs = {'doc': doc}
 
@@ -379,7 +369,7 @@ def importar_excel(request):
 				tmp.write(chunk)
 			temp_path = tmp.name
 		try:
-			resultado = importar_desde_excel_v2(temp_path, request.user, sheet_name=sheet_name)
+			resultado = importar_desde_excel(temp_path, request.user, sheet_name=sheet_name)
 		finally:
 			if os.path.exists(temp_path):
 				os.unlink(temp_path)

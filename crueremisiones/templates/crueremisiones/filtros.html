@@ -4,7 +4,7 @@
 	  <form id="form-filtros" method="get" action="{% url 'crueremisiones:main' %}" class="filtros-form">
 		<input type="hidden" name="orden" id="input-orden" value="{{ orden }}">
 
-		<!-- Row 1: Por mes + Por rango -->
+		<!-- Row 1: Por mes -->
 		<div class="filtros-row">
 		  <span class="filtros-label">Ver registros:</span>
 
@@ -29,27 +29,12 @@
 				 class="form-control form-control-sm filtro-anio"
 				 min="2000" max="{{ anio_hoy }}" step="1">
 
-		  <label class="filtro-radio-label ms-3">
-			<input type="radio" name="filtro" value="rango"
-				   {% if filtro == 'rango' %}checked{% endif %}
-				   class="filtro-radio" id="radio-rango">
-			Por rango
-		  </label>
-
-		  <input type="date" name="desde" value="{{ desde }}"
-				 class="form-control form-control-sm filtro-date"
-				 id="input-desde">
-		  <input type="date" name="hasta" value="{{ hasta }}"
-				 class="form-control form-control-sm filtro-date"
-				 id="input-hasta">
-
 		  <button type="submit" class="btn btn-primary btn-sm">
 			<i class="bi bi-search me-1"></i>Buscar
 		  </button>
-		  <span id="error-rango" class="text-danger small ms-1"></span>
 		</div>
 
-		<!-- Row 2: Por documento + Orden + Nuevo Registro -->
+		<!-- Row 2: Por documento o nombre + Paginado + Orden + Nuevo Registro -->
 		<div class="filtros-row">
 		  <span class="filtros-label" style="visibility:hidden;">Ver registros:</span>
 
@@ -57,12 +42,12 @@
 			<input type="radio" name="filtro" value="documento"
 				   {% if filtro == 'documento' %}checked{% endif %}
 				   class="filtro-radio" id="radio-documento">
-			Por documento
+			Por documento o nombre
 		  </label>
 
 		  <input type="text" name="doc" value="{{ doc }}"
-				 class="form-control form-control-sm filtro-doc"
-				 placeholder="Número de documento" id="input-doc">
+				 class="form-control form-control-sm filtro-doc-nombre"
+				 placeholder="Número de documento o nombre del paciente" id="input-doc">
 
 		  <button type="submit" class="btn btn-primary btn-sm">
 			<i class="bi bi-search me-1"></i>Buscar

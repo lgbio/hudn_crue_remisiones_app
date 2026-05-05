@@ -1,9 +1,8 @@
 /**
  * filtros.js — Lógica de controles de filtro en la vista principal.
  *
- * New inline layout: all filter controls are always visible.
+ * Filters: Por mes, Por documento o nombre.
  * Radio buttons select which filter is active.
- * Disabled styling applied to inactive filter controls.
  */
 
 'use strict';
@@ -13,16 +12,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── References ────────────────────────────────────────────────────────────
   const radios      = document.querySelectorAll('.filtro-radio');
   const formFiltros = document.getElementById('form-filtros');
-  const errorRango  = document.getElementById('error-rango');
   const errorFiltro = document.getElementById('filtro-error');
-
-  // Inline controls for each filter type
-  const mesControls   = document.querySelectorAll('.filtro-inline-mes, #input-anio');
-  const rangoControls = [document.getElementById('input-desde'), document.getElementById('input-hasta')];
-  const docControl    = document.getElementById('input-doc');
 
   const selectMes = document.getElementById('select-mes');
   const inputAnio = document.getElementById('input-anio');
+  const docControl = document.getElementById('input-doc');
 
   // ── 1. Visual state: dim inactive filter controls ─────────────────────────
 
@@ -35,13 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (selectMes) selectMes.style.opacity = mesActivo ? '1' : '0.4';
     if (inputAnio) inputAnio.style.opacity = mesActivo ? '1' : '0.4';
 
-    // Rango controls
-    var rangoActivo = (valor === 'rango');
-    rangoControls.forEach(function (el) {
-      if (el) el.style.opacity = rangoActivo ? '1' : '0.4';
-    });
-
-    // Doc control
+    // Doc/nombre control
     var docActivo = (valor === 'documento');
     if (docControl) docControl.style.opacity = docActivo ? '1' : '0.4';
   }
@@ -70,14 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (selectMes) selectMes.addEventListener('focus', function () { selectRadio('mes'); });
   if (inputAnio) inputAnio.addEventListener('focus', function () { selectRadio('mes'); });
 
-  // Rango widgets → select "rango" radio
-  rangoControls.forEach(function (el) {
-    if (el) el.addEventListener('focus', function () { selectRadio('rango'); });
-  });
-
-  // Doc widget → select "documento" radio
+  // Doc/nombre widget → select "documento" radio
   if (docControl) docControl.addEventListener('focus', function () { selectRadio('documento'); });
-
 
   // ── 2. Auto-submit on month/year change ───────────────────────────────────
 
@@ -172,52 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (checkPaginado && formFiltros) {
     checkPaginado.addEventListener('change', function () {
       formFiltros.submit();
-    });
-  }
-
-  // ── 4. Validation before submit ───────────────────────────────────────────
-
-  function limpiarErrores() {
-    if (errorRango)  errorRango.textContent  = '';
-    if (errorFiltro) errorFiltro.textContent = '';
-  }
-
-  if (formFiltros) {
-    formFiltros.addEventListener('submit', function (e) {
-      limpiarErrores();
-
-      var filtroActivo = document.querySelector('.filtro-radio:checked');
-      if (!filtroActivo) return;
-
-      var valor = filtroActivo.value;
-
-      // Validate "Por rango"
-      if (valor === 'rango') {
-        var desdeInput = document.getElementById('input-desde');
-        var hastaInput = document.getElementById('input-hasta');
-
-        if (desdeInput && hastaInput) {
-          var desde = desdeInput.value;
-          var hasta = hastaInput.value;
-          var hoyStr = new Date().toISOString().slice(0, 10);
-
-          if (desde && hasta && desde > hasta) {
-            e.preventDefault();
-            if (errorRango) {
-              errorRango.textContent = 'Desde no puede ser posterior a Hasta.';
-            }
-            return;
-          }
-
-          if (hasta && hasta > hoyStr) {
-            e.preventDefault();
-            if (errorRango) {
-              errorRango.textContent = 'No se permiten fechas futuras.';
-            }
-            return;
-          }
-        }
-      }
     });
   }
 

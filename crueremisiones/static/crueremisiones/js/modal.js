@@ -162,12 +162,16 @@ function rellenarDefectos() {
   set('modal-oportunidad', '');
 
   // Limpiar campos clínicos y de resultado
-  ['id_nombre','id_doc','id_edad','id_diagnostico','id_ta','id_fc',
+  ['id_nombre','id_doc','id_edad','id_ta','id_fc',
    'id_fr','id_tm','id_spo2','id_eps','id_institucion_reporta','id_municipio',
-   'id_medico_refiere','id_medico_hudn','id_radio_operador','id_observacion'].forEach(id => {
+   'id_medico_refiere','id_radio_operador','id_observacion'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+
+  // Pre-fill diagnostico and medico_hudn with default prefixes
+  set('id_diagnostico', 'DX:');
+  set('id_medico_hudn', 'Dr(a):');
 
   // Limpiar especialidad
   set('id_especialidad', '');
@@ -234,61 +238,39 @@ function abrirModalClonacion(id) {
     .then(r => r.json())
     .then(data => {
       limpiarErrores();
-      rellenarDefectos();
 
-      // Copiar TODOS los campos del registro origen excepto:
-      // - fecha (se asigna ahora por rellenarDefectos)
-      // - radio_operador (se asigna con el usuario actual por rellenarDefectos)
-      // - aceptado, fecha_res, oportunidad (se resetean por rellenarDefectos)
-      const set = (fieldId, val) => {
-        const el = document.getElementById(fieldId);
-        if (el) el.value = val || '';
-      };
-      set('id_nombre', data.nombre);
-      set('id_tipo_doc', data.tipo_doc);
-      set('id_doc', data.doc);
-      set('id_sexo', data.sexo);
-      set('id_especialidad', data.especialidad);
-      // Handle custom especialidad for cloning
-      const espSelectClone = document.getElementById('id_especialidad');
-      const espOtraContainerClone = document.getElementById('especialidad_otra_container');
-      const espOtraInputClone = document.getElementById('id_especialidad_otra');
-      if (espSelectClone && data.especialidad) {
-        const optExists = Array.from(espSelectClone.options).some(opt => opt.value === data.especialidad);
-        if (!optExists && data.especialidad !== '') {
-          espSelectClone.value = 'OTRA';
-          if (espOtraContainerClone) espOtraContainerClone.style.display = '';
-          if (espOtraInputClone) espOtraInputClone.value = data.especialidad;
-        } else {
-          if (espOtraContainerClone) espOtraContainerClone.style.display = (data.especialidad === 'OTRA') ? '' : 'none';
+      // Fill form with source data
+      rellenarFormulario(data);
+
+      // Set new fecha to now
+      const ahoraIso = ahora();
+      datetimeWidget.setValue(ahoraIso, 'id_fecha_date', 'id_fecha_time', 'id_fecha');
+
+      // Clear only medico_hudn and observacion
+      const medHudnEl = document.getElementById('id_medico_hudn');
+      if (medHudnEl) medHudnEl.value = 'Dr(a):';
+      const obsEl = document.getElementById('id_observacion');
+      if (obsEl) obsEl.value = '';
+
+      // Reset aceptado, fecha_res, oportunidad
+      const aceptadoEl = document.getElementById('id_aceptado');
+      if (aceptadoEl) aceptadoEl.value = 'NO';
+      datetimeWidget.setValue('', 'id_fecha_res_date', 'id_fecha_res_time', 'id_fecha_res');
+      const oportunidadEl = document.getElementById('modal-oportunidad');
+      if (oportunidadEl) oportunidadEl.value = '';
+
+      // Set radio_operador to current user
+      if (typeof USUARIO_NOMBRE_COMPLETO !== 'undefined' && USUARIO_NOMBRE_COMPLETO !== '') {
+        const radioOperadorEl = document.getElementById('id_radio_operador');
+        if (radioOperadorEl) {
+          radioOperadorEl.value = USUARIO_NOMBRE_COMPLETO;
+          radioOperadorEl.readOnly = true;
         }
       }
-      set('id_edad', data.edad);
-      set('id_gest', data.gest);
-      set('id_diagnostico', data.diagnostico);
-      set('id_ta', data.ta);
-      set('id_fc', data.fc);
-      set('id_fr', data.fr);
-      set('id_tm', data.tm);
-      set('id_spo2', data.spo2);
-      set('id_glasg', data.glasg);
-      set('id_eps', data.eps);
-      set('id_institucion_reporta', data.institucion_reporta);
-      set('id_municipio', data.municipio);
-      set('id_medico_refiere', data.medico_refiere);
-      set('id_medico_hudn', data.medico_hudn);
-      set('id_observacion', data.observacion);
 
       document.getElementById('modal-remision-id').value = '';
 
-      // Aplicar lógica GEST → SEXO
-      const sexoCampo = document.getElementById('id_sexo');
-      if (sexoCampo) sexoCampo.disabled = (data.gest === 'SI');
-
       setModoModal('crear');
-      // radio_operador is read-only, ensure it stays disabled
-      const radioEl = document.getElementById('id_radio_operador');
-      if (radioEl) radioEl.readOnly = true;
 
       const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-remision'));
       modal.show();
