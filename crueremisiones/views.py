@@ -124,7 +124,6 @@ def main_view(request):
 	desde = request.GET.get('desde', '')
 	hasta = request.GET.get('hasta', '')
 	doc = request.GET.get('doc', '')
-	paginado = request.GET.get('paginado', '') == 'True'
 	page = request.GET.get('page', 1)
 	orden = request.GET.get('orden', 'desc')  # 'desc' = newest first (default)
 
@@ -139,6 +138,19 @@ def main_view(request):
 	except (TypeError, ValueError):
 		anio = hoy.year
 
+	# Pagination: default ON for past months, OFF for current month
+	es_mes_actual = (filtro == 'mes' and mes == hoy.month and anio == hoy.year)
+	paginado_param = request.GET.get('paginado', None)
+	if paginado_param is not None:
+		# User explicitly set the checkbox
+		paginado = (paginado_param == 'True')
+	else:
+		# Default: paginated for past months/rango, not for current month
+		if es_mes_actual:
+			paginado = False
+		else:
+			paginado = True
+
 	# Construir kwargs para el servicio
 	kwargs = {'orden': orden}
 	if filtro == 'mes':
@@ -152,10 +164,10 @@ def main_view(request):
 
 	# Paginación
 	page_obj = None
-	usar_paginacion = (filtro == 'rango') or (filtro == 'mes' and paginado)
+	usar_paginacion = paginado or (filtro == 'rango' and paginado_param is None)
 
 	if usar_paginacion:
-		paginator = Paginator(qs, 20)
+		paginator = Paginator(qs, 50)
 		page_obj = paginator.get_page(page)
 		remisiones_lista = page_obj.object_list
 	else:

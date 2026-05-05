@@ -477,13 +477,14 @@ body {
 .tabla-container {
   flex: 1;
   overflow: auto;
-  padding: 8px 14px;
+  padding: 0 14px 8px 14px;
 }
 
 /* Req 4.2: tabla estilo Excel con truncado de texto */
 .tabla-remisiones {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.775rem;
   /* table-layout fixed permite truncado consistente por columna */
   table-layout: fixed;
@@ -492,6 +493,14 @@ body {
 .tabla-remisiones thead tr {
   background: #1e3a5f;
   color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure sticky works with border-collapse */
+.tabla-remisiones thead {
   position: sticky;
   top: 0;
   z-index: 10;
@@ -917,4 +926,5 @@ body {
 #form-remision input[type="text"]::placeholder,
 #form-remision textarea::placeholder {
   text-transform: none;
+  color: #999;
 }

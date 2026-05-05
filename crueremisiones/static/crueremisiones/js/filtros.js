@@ -1,81 +1,86 @@
 /**
  * filtros.js — Lógica de controles de filtro en la vista principal.
  *
- * Requisitos: 3.12, 3.13, 3.14, 3.15, 3.16
- *
- * Responsabilidades:
- *  1. Exclusividad de filtros: al seleccionar un radio button, mostrar el
- *     panel de controles correspondiente y ocultar los demás.
- *  2. Validación en cliente antes de enviar el formulario:
- *     - "Por mes": mes futuro → mensaje de error, cancelar envío.
- *     - "Por rango": desde > hasta → mensaje; hasta futura → mensaje; cancelar envío.
- *     - "Documento": sin validación de fecha.
- *  3. Envío del filtro activo al servidor mediante submit GET del formulario.
- *     Los parámetros (filtro, mes, anio, desde, hasta, doc, page) son enviados
- *     automáticamente por el formulario con method="get".
+ * New inline layout: all filter controls are always visible.
+ * Radio buttons select which filter is active.
+ * Disabled styling applied to inactive filter controls.
  */
 
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ── Referencias a elementos del DOM ──────────────────────────────────────
+  // ── References ────────────────────────────────────────────────────────────
   const radios      = document.querySelectorAll('.filtro-radio');
-  const ctrlMes     = document.getElementById('ctrl-mes');
-  const ctrlRango   = document.getElementById('ctrl-rango');
-  const ctrlDoc     = document.getElementById('ctrl-documento');
-  const errorMes    = document.getElementById('filtro-error');   // bajo ctrl-mes
-  const errorRango  = document.getElementById('error-rango');    // dentro de ctrl-rango
   const formFiltros = document.getElementById('form-filtros');
+  const errorRango  = document.getElementById('error-rango');
+  const errorFiltro = document.getElementById('filtro-error');
 
-  // ── 1. Exclusividad de filtros ────────────────────────────────────────────
+  // Inline controls for each filter type
+  const mesControls   = document.querySelectorAll('.filtro-inline-mes, #input-anio');
+  const rangoControls = [document.getElementById('input-desde'), document.getElementById('input-hasta')];
+  const docControl    = document.getElementById('input-doc');
 
-  /**
-   * Muestra únicamente el panel de controles correspondiente al filtro
-   * seleccionado y oculta los demás. También limpia los mensajes de error.
-   *
-   * @param {string} valor - Valor del radio button seleccionado ('mes', 'rango', 'documento').
-   */
-  function mostrarCtrl(valor) {
-    // Ocultar todos los paneles
-    [ctrlMes, ctrlRango, ctrlDoc].forEach(function (el) {
-      if (el) el.classList.add('d-none');
+  const selectMes = document.getElementById('select-mes');
+  const inputAnio = document.getElementById('input-anio');
+
+  // ── 1. Visual state: dim inactive filter controls ─────────────────────────
+
+  function actualizarEstadoFiltros() {
+    var filtroActivo = document.querySelector('.filtro-radio:checked');
+    var valor = filtroActivo ? filtroActivo.value : 'mes';
+
+    // Mes controls
+    var mesActivo = (valor === 'mes');
+    if (selectMes) selectMes.style.opacity = mesActivo ? '1' : '0.4';
+    if (inputAnio) inputAnio.style.opacity = mesActivo ? '1' : '0.4';
+
+    // Rango controls
+    var rangoActivo = (valor === 'rango');
+    rangoControls.forEach(function (el) {
+      if (el) el.style.opacity = rangoActivo ? '1' : '0.4';
     });
 
-    // Mostrar el panel activo
-    if (valor === 'mes'       && ctrlMes)   ctrlMes.classList.remove('d-none');
-    if (valor === 'rango'     && ctrlRango) ctrlRango.classList.remove('d-none');
-    if (valor === 'documento' && ctrlDoc)   ctrlDoc.classList.remove('d-none');
-
-    // Limpiar mensajes de error al cambiar de filtro
-    limpiarErrores();
+    // Doc control
+    var docActivo = (valor === 'documento');
+    if (docControl) docControl.style.opacity = docActivo ? '1' : '0.4';
   }
 
-  /** Borra todos los mensajes de validación inline. */
-  function limpiarErrores() {
-    if (errorMes)   errorMes.textContent   = '';
-    if (errorRango) errorRango.textContent = '';
-  }
+  // Initialize
+  actualizarEstadoFiltros();
 
-  // Inicializar estado al cargar la página (refuerza lo que ya hace el template)
-  var radioChecked = document.querySelector('.filtro-radio:checked');
-  if (radioChecked) {
-    mostrarCtrl(radioChecked.value);
-  }
-
-  // Escuchar cambios en los radio buttons
+  // Update on radio change
   radios.forEach(function (radio) {
     radio.addEventListener('change', function () {
-      mostrarCtrl(this.value);
+      actualizarEstadoFiltros();
     });
   });
 
-  // ── 2. Auto-submit on month/year change ─────────────────────────────────
+  // ── 1b. Auto-select radio when clicking on a filter widget ────────────────
 
-  var selectMes = document.getElementById('select-mes');
-  var inputAnio = document.getElementById('input-anio');
+  function selectRadio(value) {
+    var radio = document.querySelector('.filtro-radio[value="' + value + '"]');
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      actualizarEstadoFiltros();
+    }
+  }
 
-  /** Disable future months when the selected year is the current year. */
+  // Mes widgets → select "mes" radio
+  if (selectMes) selectMes.addEventListener('focus', function () { selectRadio('mes'); });
+  if (inputAnio) inputAnio.addEventListener('focus', function () { selectRadio('mes'); });
+
+  // Rango widgets → select "rango" radio
+  rangoControls.forEach(function (el) {
+    if (el) el.addEventListener('focus', function () { selectRadio('rango'); });
+  });
+
+  // Doc widget → select "documento" radio
+  if (docControl) docControl.addEventListener('focus', function () { selectRadio('documento'); });
+
+
+  // ── 2. Auto-submit on month/year change ───────────────────────────────────
+
   function actualizarMesesDisponibles() {
     if (!selectMes || !inputAnio) return;
     var anioVal = parseInt(inputAnio.value, 10);
@@ -85,17 +90,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Array.from(selectMes.options).forEach(function (opt) {
       var mesVal = parseInt(opt.value, 10);
-      if (anioVal === anioHoy && mesVal > mesHoy) {
-        opt.disabled = true;
-      } else {
-        opt.disabled = false;
-      }
+      opt.disabled = (anioVal === anioHoy && mesVal > mesHoy);
     });
 
-    // If the currently selected month is now disabled, select the latest valid month
+    // If selected month is now disabled, select the latest valid month
     var selOpt = selectMes.options[selectMes.selectedIndex];
     if (selOpt && selOpt.disabled) {
-      // Find the last enabled option
       for (var i = selectMes.options.length - 1; i >= 0; i--) {
         if (!selectMes.options[i].disabled) {
           selectMes.selectedIndex = i;
@@ -105,10 +105,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Auto-submit when month changes
+  // When "Por mes" radio is selected, set to current month/year and auto-submit
+  var radioMes = document.getElementById('radio-mes');
+  if (radioMes && formFiltros && selectMes && inputAnio) {
+    radioMes.addEventListener('change', function () {
+      if (this.checked) {
+        var hoy = new Date();
+        var mesHoy = hoy.getMonth() + 1;
+        var anioHoy = hoy.getFullYear();
+        selectMes.value = String(mesHoy);
+        inputAnio.value = String(anioHoy);
+        actualizarMesesDisponibles();
+        formFiltros.submit();
+      }
+    });
+  }
+
+  // Auto-submit when month changes (only if mes filter is active)
   if (selectMes && formFiltros) {
     selectMes.addEventListener('change', function () {
-      formFiltros.submit();
+      var filtroActivo = document.querySelector('.filtro-radio:checked');
+      if (filtroActivo && filtroActivo.value === 'mes') {
+        formFiltros.submit();
+      }
     });
   }
 
@@ -116,7 +135,10 @@ document.addEventListener('DOMContentLoaded', function () {
   if (inputAnio && formFiltros) {
     inputAnio.addEventListener('change', function () {
       actualizarMesesDisponibles();
-      formFiltros.submit();
+      var filtroActivo = document.querySelector('.filtro-radio:checked');
+      if (filtroActivo && filtroActivo.value === 'mes') {
+        formFiltros.submit();
+      }
     });
   }
 
@@ -131,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function () {
       var esDesc = inputOrden.value === 'desc';
       inputOrden.value = esDesc ? 'asc' : 'desc';
 
-      // Update button visual immediately
       var icon = btnOrden.querySelector('i');
       if (icon) {
         icon.className = esDesc ? 'bi bi-sort-up me-1' : 'bi bi-sort-down me-1';
@@ -145,44 +166,32 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ── 4. Validación en cliente antes de enviar ──────────────────────────────
+  // ── 3b. Paginado checkbox auto-submit ─────────────────────────────────────
+
+  var checkPaginado = document.getElementById('check-paginado');
+  if (checkPaginado && formFiltros) {
+    checkPaginado.addEventListener('change', function () {
+      formFiltros.submit();
+    });
+  }
+
+  // ── 4. Validation before submit ───────────────────────────────────────────
+
+  function limpiarErrores() {
+    if (errorRango)  errorRango.textContent  = '';
+    if (errorFiltro) errorFiltro.textContent = '';
+  }
 
   if (formFiltros) {
     formFiltros.addEventListener('submit', function (e) {
       limpiarErrores();
 
       var filtroActivo = document.querySelector('.filtro-radio:checked');
-      if (!filtroActivo) return; // Sin filtro seleccionado, dejar pasar
+      if (!filtroActivo) return;
 
       var valor = filtroActivo.value;
 
-      // ── Validación "Por mes" (Requisito 3.14) ──────────────────────────
-      if (valor === 'mes') {
-        var mesSelect  = formFiltros.querySelector('[name="mes"]');
-        var anioInput  = formFiltros.querySelector('[name="anio"]');
-
-        if (mesSelect && anioInput) {
-          var mesVal  = parseInt(mesSelect.value, 10);
-          var anioVal = parseInt(anioInput.value, 10);
-          var hoy     = new Date();
-          var anioHoy = hoy.getFullYear();
-          var mesHoy  = hoy.getMonth() + 1; // getMonth() es 0-based
-
-          var esFuturo = (anioVal > anioHoy) ||
-                         (anioVal === anioHoy && mesVal > mesHoy);
-
-          if (esFuturo) {
-            e.preventDefault();
-            if (errorMes) {
-              errorMes.textContent =
-                'Solo se permiten meses anteriores o el mes actual.';
-            }
-            return;
-          }
-        }
-      }
-
-      // ── Validación "Por rango" (Requisitos 3.15, 3.16) ────────────────
+      // Validate "Por rango"
       if (valor === 'rango') {
         var desdeInput = document.getElementById('input-desde');
         var hastaInput = document.getElementById('input-hasta');
@@ -190,31 +199,25 @@ document.addEventListener('DOMContentLoaded', function () {
         if (desdeInput && hastaInput) {
           var desde = desdeInput.value;
           var hasta = hastaInput.value;
-          var hoyStr = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+          var hoyStr = new Date().toISOString().slice(0, 10);
 
-          // Requisito 3.15: desde > hasta
           if (desde && hasta && desde > hasta) {
             e.preventDefault();
             if (errorRango) {
-              errorRango.textContent =
-                'La fecha "Desde" no puede ser posterior a "Hasta".';
+              errorRango.textContent = 'Desde no puede ser posterior a Hasta.';
             }
             return;
           }
 
-          // Requisito 3.16: hasta futura
           if (hasta && hasta > hoyStr) {
             e.preventDefault();
             if (errorRango) {
-              errorRango.textContent =
-                'No se permiten fechas futuras en el campo "Hasta".';
+              errorRango.textContent = 'No se permiten fechas futuras.';
             }
             return;
           }
         }
       }
-
-      // "Documento": sin validación de fecha — el formulario se envía normalmente.
     });
   }
 

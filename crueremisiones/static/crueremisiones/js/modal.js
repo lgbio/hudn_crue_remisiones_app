@@ -381,26 +381,13 @@ function guardarRemision() {
           // Editing: stay on the current view
           window.location.reload();
         } else {
-          // Creating: navigate to current month so the new record is visible
+          // Creating/cloning: always navigate to current month
           var hoy = new Date();
           var mesHoy = hoy.getMonth() + 1;
           var anioHoy = hoy.getFullYear();
-
-          // Read current filter params from the URL
           var params = new URLSearchParams(window.location.search);
-          var mesVista = parseInt(params.get('mes'), 10) || mesHoy;
-          var anioVista = parseInt(params.get('anio'), 10) || anioHoy;
           var orden = params.get('orden') || 'desc';
-
-          // If viewing a past month/year, switch to current month
-          var esPasado = (anioVista < anioHoy) ||
-                         (anioVista === anioHoy && mesVista < mesHoy);
-
-          if (esPasado) {
-            window.location.href = '?filtro=mes&mes=' + mesHoy + '&anio=' + anioHoy + '&orden=' + orden;
-          } else {
-            window.location.reload();
-          }
+          window.location.href = '?filtro=mes&mes=' + mesHoy + '&anio=' + anioHoy + '&orden=' + orden;
         }
       } else {
         if (data.errors) {
@@ -487,25 +474,16 @@ document.addEventListener('DOMContentLoaded', function () {
   // Observación: auto-fill fecha_res with current date/time when user types
   const observacionEl = document.getElementById('id_observacion');
   if (observacionEl) {
-    let fechaResAutoFilled = false;
     observacionEl.addEventListener('input', function() {
-      // Only auto-fill once per modal open, and only if fecha_res is empty
+      // Every time observacion changes, update fecha_res to now and recalculate oportunidad
       const fechaResHiddenEl = document.getElementById('id_fecha_res');
-      if (!fechaResAutoFilled && this.value.trim() !== '' && fechaResHiddenEl && !fechaResHiddenEl.value) {
+      if (this.value.trim() !== '' && fechaResHiddenEl) {
         const now = ahora();
         datetimeWidget.setValue(now, 'id_fecha_res_date', 'id_fecha_res_time', 'id_fecha_res');
-        fechaResAutoFilled = true;
         // Trigger oportunidad calculation
         fechaResHiddenEl.dispatchEvent(new CustomEvent('datetimeChanged', { bubbles: true }));
       }
     });
-    // Reset flag when modal opens
-    const modalEl = document.getElementById('modal-remision');
-    if (modalEl) {
-      modalEl.addEventListener('show.bs.modal', function() {
-        fechaResAutoFilled = false;
-      });
-    }
   }
 
   // Importar Excel — sheet selection and AJAX import
