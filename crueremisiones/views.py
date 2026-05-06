@@ -7,6 +7,7 @@ autenticación mediante el decorador @login_required.
 
 from datetime import date
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -54,29 +55,67 @@ MESES_ES = [
 
 def login_view(request):
 	"""GET/POST /login/ — Autenticación de usuario."""
+
 	if request.user.is_authenticated:
-		return redirect('/')
+		return redirect(settings.LOGIN_REDIRECT_URL)
 
 	form = LoginForm(request.POST or None)
 	error = None
 
-	if request.method == 'POST' and form.is_valid():
-		username = form.cleaned_data['username']
-		password = form.cleaned_data['password']
+	if request.method == "POST" and form.is_valid():
+		username = form.cleaned_data["username"]
+		password = form.cleaned_data["password"]
+
 		user = authenticate(request, username=username, password=password)
+
 		if user is not None:
 			login(request, user)
-			return redirect('/')
-		else:
-			error = 'Usuario o contraseña incorrectos.'
 
-	return render(request, 'crueremisiones/login.html', {'form': form, 'error': error})
+			next_url = request.GET.get("next")
+			if next_url:
+				return redirect(next_url)
+
+			return redirect(settings.LOGIN_REDIRECT_URL)
+
+		error = "Usuario o contraseña incorrectos."
+
+	return render(
+		request,
+		"crueremisiones/login.html",
+		{
+			"form": form,
+			"error": error,
+		},
+	)
+
+#def login_view(request):
+#	"""GET/POST /login/ — Autenticación de usuario."""
+#	if request.user.is_authenticated:
+#		#return redirect('/')
+#		return redirect(settings.LOGIN_REDIRECT_URL)
+#
+#	form = LoginForm(request.POST or None)
+#	error = None
+#
+#	if request.method == 'POST' and form.is_valid():
+#		username = form.cleaned_data['username']
+#		password = form.cleaned_data['password']
+#		user = authenticate(request, username=username, password=password)
+#		if user is not None:
+#			login(request, user)
+#			return redirect(settings.LOGIN_REDIRECT_URL)
+#			#return redirect('/')
+#		else:
+#			error = 'Usuario o contraseña incorrectos.'
+#
+#	return render(request, 'crueremisiones/login.html', {'form': form, 'error': error})
 
 
 def logout_view(request):
 	"""POST /logout/ — Cierre de sesión."""
 	logout(request)
-	return redirect('/login/')
+	#return redirect('/login/')
+	return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
 def recuperar_password_view(request):

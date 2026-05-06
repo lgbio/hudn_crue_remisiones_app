@@ -16,17 +16,15 @@ DEBUG = False
 #ALLOWED_HOSTS = ["*"]
 #ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 ALLOWED_HOSTS = [
-	"172.20.209.60",
 	"localhost",
 	"127.0.0.1",
+	"172.20.209.60"
 ]
 
+#FORCE_SCRIPT_NAME = '/crue-remisiones'
 USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
-
 CSRF_TRUSTED_ORIGINS = [
     'http://172.20.10.250',
-    'http://172.20.209.60',
 ]
 
 INSTALLED_APPS = [
@@ -59,7 +57,6 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-				"django.template.context_processors.csrf",
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -97,14 +94,12 @@ USE_I18N = True
 USE_TZ = False
 
 # ─── Archivos estáticos ──────────────────────────────────────────────────────
-FORCE_SCRIPT_NAME = '/crue-remisiones'
-
-STATIC_URL       = '/crue-remisiones/static/'
+STATIC_URL       = '/static/'
 STATIC_ROOT      = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = []
 
 # ─── Archivos de medios ──────────────────────────────────────────────────────
-MEDIA_URL        = '/crue-remisiones/media/'
+MEDIA_URL        = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -113,9 +108,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'crueremisiones.Usuario'
 
 # ─── Autenticación ───────────────────────────────────────────────────────────
-LOGIN_URL = '/crue-remisiones/login/'
-LOGIN_REDIRECT_URL = '/crue-remisiones/'
-LOGOUT_REDIRECT_URL = '/crue-remisiones/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 # Email (configurar SMTP en producción)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
