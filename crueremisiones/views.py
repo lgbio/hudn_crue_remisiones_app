@@ -27,7 +27,7 @@ from .forms import (
 	UsuarioEditForm,
 	UsuarioForm,
 )
-from .models import Remision, Usuario
+from .models import Remision, Radiooperador
 from .services import (
 	calcular_oportunidad,
 	enviar_email_recuperacion,
@@ -91,7 +91,7 @@ def login_view(request):
 #def login_view(request):
 #	"""GET/POST /login/ — Autenticación de usuario."""
 #	if request.user.is_authenticated:
-#		#return redirect('/')
+#		#return redirect('crueremisiones:main')
 #		return redirect(settings.LOGIN_REDIRECT_URL)
 #
 #	form = LoginForm(request.POST or None)
@@ -104,7 +104,7 @@ def login_view(request):
 #		if user is not None:
 #			login(request, user)
 #			return redirect(settings.LOGIN_REDIRECT_URL)
-#			#return redirect('/')
+#			#return redirect('crueremisiones:main')
 #		else:
 #			error = 'Usuario o contraseña incorrectos.'
 #
@@ -126,12 +126,12 @@ def recuperar_password_view(request):
 	if request.method == 'POST' and form.is_valid():
 		username = form.cleaned_data['username']
 		try:
-			user = Usuario.objects.get(username=username)
+			user = Radiooperador.objects.get(username=username)
 			password_temp = generar_password_temporal()
 			user.set_password(password_temp)
 			user.save()
 			enviar_email_recuperacion(user, password_temp)
-		except Usuario.DoesNotExist:
+		except Radiooperador.DoesNotExist:
 			pass  # No revelar si el usuario existe o no (seguridad)
 		# Siempre mostrar mensaje genérico
 		mensaje = (
@@ -202,7 +202,7 @@ def main_view(request):
 	usar_paginacion = paginado
 
 	if usar_paginacion:
-		paginator = Paginator(qs, 50)
+		paginator = Paginator(qs, 15)
 		page_obj = paginator.get_page(page)
 		remisiones_lista = page_obj.object_list
 	else:
@@ -454,16 +454,16 @@ def usuarios_view(request):
 	"""GET/POST /usuarios/ — Gestión de usuarios (solo DIRECTOR)."""
 	if request.user.rol != 'DIRECTOR':
 		messages.error(request, 'No tiene permisos para acceder a esta sección.')
-		return redirect('/')
+		return redirect('crueremisiones:main')
 
-	usuarios = Usuario.objects.all().order_by('username')
+	usuarios = Radiooperador.objects.all().order_by('username')
 	form = UsuarioForm(request.POST or None)
 	error = None
 
 	if request.method == 'POST':
 		if form.is_valid():
 			data = form.cleaned_data
-			user = Usuario.objects.create_user(
+			user = Radiooperador.objects.create_user(
 				username=data['username'],
 				password=data['password'],
 				first_name=data['first_name'],
@@ -473,7 +473,7 @@ def usuarios_view(request):
 			user.rol = data['rol']
 			user.save()
 			messages.success(request, f'Usuario "{user.username}" creado correctamente.')
-			return redirect('/usuarios/')
+			return redirect('crueremisiones:usuarios')
 		else:
 			error = 'Por favor corrija los errores del formulario.'
 
@@ -499,7 +499,7 @@ def usuario_delete(request, pk):
 			status=400,
 		)
 
-	user = get_object_or_404(Usuario, pk=pk)
+	user = get_object_or_404(Radiooperador, pk=pk)
 	user.delete()
 	return JsonResponse({'ok': True})
 
@@ -509,9 +509,9 @@ def usuario_edit(request, pk):
 	"""GET/POST /usuarios/<pk>/editar/ — Editar usuario (solo DIRECTOR)."""
 	if request.user.rol != 'DIRECTOR':
 		messages.error(request, 'No tiene permisos para esta acción.')
-		return redirect('/')
+		return redirect('crueremisiones:main')
 
-	user = get_object_or_404(Usuario, pk=pk)
+	user = get_object_or_404(Radiooperador, pk=pk)
 
 	if request.method == 'POST':
 		form = UsuarioEditForm(request.POST)
@@ -523,7 +523,7 @@ def usuario_edit(request, pk):
 			user.rol = data['rol']
 			user.save()
 			messages.success(request, f'Usuario "{user.username}" actualizado correctamente.')
-			return redirect('/usuarios/')
+			return redirect('crueremisiones:usuarios')
 	else:
 		form = UsuarioEditForm(initial={
 			'first_name': user.first_name,
@@ -543,9 +543,9 @@ def usuario_cambiar_password(request, pk):
 	"""GET/POST /usuarios/<pk>/cambiar-password/ — Cambiar contraseña de usuario (solo DIRECTOR)."""
 	if request.user.rol != 'DIRECTOR':
 		messages.error(request, 'No tiene permisos para esta acción.')
-		return redirect('/')
+		return redirect('crueremisiones:main')
 
-	user = get_object_or_404(Usuario, pk=pk)
+	user = get_object_or_404(Radiooperador, pk=pk)
 
 	if request.method == 'POST':
 		form = AdminCambiarPasswordForm(request.POST)
@@ -553,7 +553,7 @@ def usuario_cambiar_password(request, pk):
 			user.set_password(form.cleaned_data['password_nueva'])
 			user.save()
 			messages.success(request, f'Contraseña de "{user.username}" cambiada correctamente.')
-			return redirect('/usuarios/')
+			return redirect('crueremisiones:usuarios')
 	else:
 		form = AdminCambiarPasswordForm()
 

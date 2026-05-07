@@ -54,13 +54,14 @@ def calcular_oportunidad(fecha, fecha_res) -> str:
 
 def es_registro_editable(remision) -> bool:
 	"""
-	Retorna True si la fecha del registro corresponde al día de hoy.
-	Los registros históricos son de solo lectura.
+	Retorna True si el registro tiene como máximo 1 día de antigüedad.
+	Es decir, es editable si fecha.date() es hoy o ayer.
 	"""
 	if not remision.fecha:
 		return False
 
-	return remision.fecha.date() == date.today()
+	dias_diferencia = (date.today() - remision.fecha.date()).days
+	return dias_diferencia <= 1
 
 #def es_registro_editable(remision) -> bool:
 #	"""

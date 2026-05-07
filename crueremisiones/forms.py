@@ -3,7 +3,7 @@ Formularios Django para la aplicación CRUE Remisiones Pacientes.
 """
 from django import forms
 
-from .models import Remision, Usuario
+from .models import Remision, Radiooperador
 from .services import validar_edad, validar_glasg, validar_ta
 
 
@@ -100,7 +100,7 @@ class RemisionForm(forms.ModelForm):
             'institucion_reporta': forms.TextInput(attrs={'class': 'form-control'}),
             'municipio': forms.TextInput(attrs={'class': 'form-control'}),
             'medico_refiere': forms.TextInput(attrs={'class': 'form-control'}),
-            'medico_hudn': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'style': 'resize:vertical'}),
+            'medico_hudn': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '300'}),
             'radio_operador': forms.TextInput(attrs={'class': 'form-control'}),
             'observacion': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'style': 'resize:vertical'}),
             'aceptado': forms.Select(attrs={'class': 'form-select'}),
@@ -202,19 +202,19 @@ class UsuarioForm(forms.Form):
     )
     rol = forms.ChoiceField(
         label='Rol',
-        choices=Usuario.ROL_CHOICES,
+        choices=Radiooperador.ROL_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
 
     def clean_username(self):
         username = self.cleaned_data['username'].strip()
-        if Usuario.objects.filter(username=username).exists():
+        if Radiooperador.objects.filter(username=username).exists():
             raise forms.ValidationError('Ya existe un usuario con ese nombre de usuario.')
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip()
-        if Usuario.objects.filter(email=email).exists():
+        if Radiooperador.objects.filter(email=email).exists():
             raise forms.ValidationError('Ya existe un usuario con ese correo electrónico.')
         return email
 
@@ -237,7 +237,7 @@ class UsuarioEditForm(forms.Form):
     )
     rol = forms.ChoiceField(
         label='Rol',
-        choices=Usuario.ROL_CHOICES,
+        choices=Radiooperador.ROL_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
 

@@ -4,8 +4,8 @@ from django.db import models
 from django.utils import timezone
 
 
-class Usuario(AbstractUser):
-	"""Modelo de usuario unificado que reemplaza User + PerfilUsuario."""
+class Radiooperador(AbstractUser):
+	"""Modelo de usuario del sistema CRUE Remisiones."""
 
 	ROL_CHOICES = [
 		('RADIOOPERADOR', 'Radiooperador'),
@@ -20,8 +20,8 @@ class Usuario(AbstractUser):
 	)
 
 	class Meta:
-		verbose_name = 'Usuario'
-		verbose_name_plural = 'Usuarios'
+		verbose_name = 'Radiooperador'
+		verbose_name_plural = 'Radiooperadores'
 
 	def __str__(self):
 		return f'{self.username} ({self.rol})'
@@ -209,7 +209,8 @@ class Remision(models.Model):
 		default='',
 		verbose_name='Médico que refiere',
 	)
-	medico_hudn = models.TextField(
+	medico_hudn = models.CharField(
+		max_length=300,
 		blank=True,
 		default='',
 		verbose_name='Médico HUDN que confirma',
@@ -268,13 +269,14 @@ class Remision(models.Model):
 	@property
 	def es_editable(self) -> bool:
 		"""
-		Un registro es editable si su fecha.date() es igual a hoy.
+		Un registro es editable si tiene como máximo 1 día de antigüedad.
 		"""
 		from datetime import date
 		if not self.fecha:
 			return False
 
-		return self.fecha.date() == date.today()
+		dias_diferencia = (date.today() - self.fecha.date()).days
+		return dias_diferencia <= 1
 
 #	 @property
 #	 def es_editable(self) -> bool:

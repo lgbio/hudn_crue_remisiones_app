@@ -108,7 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
     btnConfirmarEliminar.addEventListener('click', function () {
       if (!idAEliminar) return;
 
-      const url = URLS.remisionEliminar.replace('__ID__', idAEliminar);
+      //const url = URLS.remisionEliminar.replace('__ID__', idAEliminar);
+      const url = URLS.remisionEliminar.replace('999999', idAEliminar);
       const body = new URLSearchParams({ csrfmiddlewaretoken: CSRF_TOKEN });
 
       fetch(url, {

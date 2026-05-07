@@ -212,7 +212,9 @@ function abrirModalNuevo() {
 
 /** Abre el modal en modo edición o solo lectura según editabilidad. */
 function abrirModalEdicion(id) {
-  const url = URLS.remisionDetalle.replace('__ID__', id);
+  console.log ("id:", id);
+  //const url = URLS.remisionDetalle.replace('__ID__', id);
+  const url = URLS.remisionDetalle.replace('999999', id);
   fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
     .then(r => r.json())
     .then(data => {
@@ -228,12 +230,21 @@ function abrirModalEdicion(id) {
       const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-remision'));
       modal.show();
     })
-    .catch(() => alert('Error al cargar los datos del registro.'));
+    //.catch(() => alert('Error al cargar los datos del registro.'));
+	.catch(err => {
+      console.error("Error cargando remisión:");
+      console.error(err);
+      console.error(err.stack);
+
+      alert('Error al cargar los datos del registro.');
+    });
 }
 
 /** Abre el modal en modo clonación: copia TODOS los campos excepto fecha, radio_operador, aceptado, fecha_res y oportunidad. */
 function abrirModalClonacion(id) {
-  const url = URLS.remisionDetalle.replace('__ID__', id);
+  console.log ("id:", id);
+  //const url = URLS.remisionDetalle.replace('__ID__', id);
+  const url = URLS.remisionDetalle.replace('999999', id);
   fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
     .then(r => r.json())
     .then(data => {
@@ -336,7 +347,7 @@ function guardarRemision() {
   }
 
   const url = esEdicion
-    ? URLS.remisionEditar.replace('__ID__', remisionId)
+    ? URLS.remisionEditar.replace('999999', remisionId)
     : URLS.remisionNueva;
 
   const body = new URLSearchParams(recogerDatosFormulario());
@@ -488,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function () {
       formData.append('archivo', this.files[0]);
       formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
 
-      fetch('/importar/excel/hojas/', {
+      fetch(URLS.importarExcelHojas, {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData,
@@ -516,11 +527,50 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Handle import form submit
+  // Handle import form submit — show modal dialog
   if (formImportar) {
     formImportar.addEventListener('submit', function (e) {
       e.preventDefault();
       const formData = new FormData(this);
+
+      // Show processing modal
+      let importModal = document.getElementById('modal-importar-estado');
+      if (!importModal) {
+        importModal = document.createElement('div');
+        importModal.id = 'modal-importar-estado';
+        importModal.className = 'modal fade';
+        importModal.tabIndex = -1;
+        importModal.setAttribute('data-bs-backdrop', 'static');
+        importModal.setAttribute('data-bs-keyboard', 'false');
+        importModal.innerHTML = `
+          <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body text-center py-4">
+                <div id="importar-modal-spinner" class="mb-3">
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+                <p id="importar-modal-msg" class="mb-0 fw-semibold">Importando...</p>
+              </div>
+              <div id="importar-modal-footer" class="modal-footer d-none justify-content-center">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Aceptar</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(importModal);
+      }
+
+      const modalMsg = importModal.querySelector('#importar-modal-msg');
+      const modalSpinner = importModal.querySelector('#importar-modal-spinner');
+      const modalFooter = importModal.querySelector('#importar-modal-footer');
+
+      // Reset modal state
+      modalMsg.textContent = 'Importando...';
+      modalMsg.className = 'mb-0 fw-semibold';
+      modalSpinner.classList.remove('d-none');
+      modalFooter.classList.add('d-none');
+
+      const bsModal = bootstrap.Modal.getOrCreateInstance(importModal);
+      bsModal.show();
 
       fetch(this.action, {
         method: 'POST',
@@ -529,22 +579,28 @@ document.addEventListener('DOMContentLoaded', function () {
       })
         .then(r => r.json())
         .then(data => {
-          if (resultadoDiv) {
-            if (data.ok) {
-              resultadoDiv.className = 'mt-1 small text-success sidebar-text';
-              resultadoDiv.textContent = `✓ ${data.importados} registros importados.`;
-              setTimeout(() => window.location.reload(), 1500);
-            } else {
-              resultadoDiv.className = 'mt-1 small text-danger sidebar-text';
-              resultadoDiv.textContent = data.error || 'Error al importar.';
-            }
+          modalSpinner.classList.add('d-none');
+          modalFooter.classList.remove('d-none');
+          modalFooter.classList.add('d-flex');
+
+          if (data.ok) {
+            modalMsg.textContent = `✓ ${data.importados} registros importados correctamente.`;
+            modalMsg.className = 'mb-0 fw-semibold text-success';
+            // Reload after user closes modal
+            importModal.addEventListener('hidden.bs.modal', function () {
+              window.location.reload();
+            }, { once: true });
+          } else {
+            modalMsg.textContent = data.error || 'Error al importar.';
+            modalMsg.className = 'mb-0 fw-semibold text-danger';
           }
         })
         .catch(() => {
-          if (resultadoDiv) {
-            resultadoDiv.className = 'mt-1 small text-danger sidebar-text';
-            resultadoDiv.textContent = 'Error de red.';
-          }
+          modalSpinner.classList.add('d-none');
+          modalFooter.classList.remove('d-none');
+          modalFooter.classList.add('d-flex');
+          modalMsg.textContent = 'Error de red al importar.';
+          modalMsg.className = 'mb-0 fw-semibold text-danger';
         });
     });
   }
