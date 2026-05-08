@@ -15,7 +15,8 @@ SECRET_KEY = 'django-insecure-fvyg4s259i8yf8+g)bsj!v)r_--bnq$8@+5v63*1u&*f)@9x(!
 #ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 ALLOWED_HOSTS = [
 	'192.168.1.18',
-	"172.20.208.155",
+    '172.20.211.163',
+	"172.20.209.60",
 	"localhost",
 	"127.0.0.1",
 ]
@@ -25,7 +26,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
 CSRF_TRUSTED_ORIGINS = [
     'http://192.168.1.18',
     'http://172.20.10.250',
-    'http://172.20.208.155',
+    'http://172.20.211.163',
+    'http://172.20.209.60',
 ]
 
 INSTALLED_APPS = [
@@ -73,21 +75,19 @@ import os
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': os.getenv('DB_DEFAULT_NAME', 'GestorInstitucional'),
-        'USER': os.getenv('DB_DEFAULT_USER', 'apantoja'),
-        'PASSWORD': os.getenv('DB_DEFAULT_PASSWORD', 'ConsultasPantojaHUDN_2026$'),
-        'HOST': os.getenv('DB_DEFAULT_HOST', '172.20.100.209'),
-        'PORT': os.getenv('DB_DEFAULT_PORT', ''),
-        'CONN_MAX_AGE': 600,
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME', 'GestorInstitucional'),
+        'USER': os.getenv('DB_USER', 'apantoja'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'ConsultasPantojaHUDN_2026$'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'timeout': 30,
+            'charset': 'utf8mb4',
         },
     },
 }
 
-# No database router needed — single database (institutional MSSQL)
+# No database router needed — single database (simulates production MSSQL)
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -104,7 +104,7 @@ USE_TZ = False
 
 # ─── Configuration for running either: local or service  ─────────────────────────
 DEBUG = True
-LOCAL = True  # Run as python manage.py runserver instead as a service
+LOCAL = False  # Run as python manage.py runserver instead as a service
 
 USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
