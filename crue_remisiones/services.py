@@ -268,6 +268,27 @@ def enviar_email_recuperacion(usuario, password_temp: str) -> None:
 		fail_silently=False,
 	)
 
+# ---------------------------------------------------------------------------
+# For truncating text larger than field max_length
+# ---------------------------------------------------------------------------
+# Build dict: {field_name: max_length}
+fieldMaxLens = {
+	f.name: f.max_length
+	for f in Remision._meta.fields
+	if hasattr(f, 'max_length') and f.max_length
+}
+
+def truncate_fields(data: dict) -> dict:
+	for field, max_len in fieldMaxLens.items():
+		val = data.get(field)
+
+		if isinstance(val, str) and len(val) > max_len:
+			print(f"+++ Truncando campo '{field}' "
+				  f"({len(val)} -> {max_len})")
+
+			data[field] = val[:max_len]
+
+	return data
 
 ## ---------------------------------------------------------------------------
 ## 3.5 — Importación desde Excel
@@ -301,6 +322,9 @@ def importar_desde_excel (archivo_o_path, usuario, sheet_name=None) -> dict:
 				"OTRA", *r[11:25], sel(sel(r[25], r[26]), r[27]), fechaHora(r[28], r[29])
 			]
 			fieldValueDic = dict(zip(remFields, rowReg))
+
+			# Truncate oversized text fields
+			fieldValueDic = truncate_fields(fieldValueDic)
 			print(f"\n+++ {fieldValueDic=}")
 
 			fecha  = fieldValueDic.get('fecha')
