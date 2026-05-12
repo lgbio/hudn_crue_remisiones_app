@@ -17,7 +17,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
-    'http://192.168.1.18',
+    'http://192.168.1.79',
     'http://172.20.10.250',
     'http://172.20.211.163',
     'http://172.20.209.60',
@@ -118,40 +118,26 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # ─── Internacionalización ────────────────────────────────────────────────────
 LANGUAGE_CODE = 'es-co'
-TIME_ZONE = 'America/Bogota'
-USE_I18N = True
-USE_TZ = False
+TIME_ZONE     = 'America/Bogota'
+USE_I18N      = True
+USE_TZ        = True
 
 # ─── Configuration for running either: local or service  ─────────────────────────
 DEBUG = True
-LOCAL = True  # Run as python manage.py runserver instead as a service
 
 USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
-if LOCAL:
-	# ─── Archivos estáticos ──────────────────────────────────────────────────────
-	FORCE_SCRIPT_NAME = '/'
-	STATIC_URL        = '/static/'
-	STATIC_ROOT       = BASE_DIR / 'staticfiles'
-	# ─── Archivos de medios ──────────────────────────────────────────────────────
-	MEDIA_URL        = '/media/'
-	MEDIA_ROOT = BASE_DIR / 'media'
-	# ─── Autenticación ───────────────────────────────────────────────────────────
-	LOGIN_URL = '/crue-remisiones/login/'
-	LOGIN_REDIRECT_URL = '/crue-remisiones/'
-	LOGOUT_REDIRECT_URL = '/crue-remisiones/login/'
-else:
-	# ─── Archivos estáticos ──────────────────────────────────────────────────────
-	FORCE_SCRIPT_NAME = '/crue-remisiones'
-	STATIC_URL        = '/crue-remisiones/static/'
-	STATIC_ROOT       = BASE_DIR / 'staticfiles'
-	# ─── Archivos de medios ──────────────────────────────────────────────────────
-	MEDIA_URL        = '/crue-remisiones/media/'
-	MEDIA_ROOT = BASE_DIR / 'media'
-	# ─── Autenticación ───────────────────────────────────────────────────────────
-	LOGIN_URL = '/crue-remisiones/login/'
-	LOGIN_REDIRECT_URL = '/crue-remisiones/'
-	LOGOUT_REDIRECT_URL = '/crue-remisiones/login/'
+# ─── Archivos estáticos ──────────────────────────────────────────────────────
+FORCE_SCRIPT_NAME = '/'
+STATIC_URL        = '/static/'
+STATIC_ROOT       = BASE_DIR / 'staticfiles'
+# ─── Archivos de medios ──────────────────────────────────────────────────────
+MEDIA_URL        = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+# ─── Autenticación ───────────────────────────────────────────────────────────
+LOGIN_URL = '/crue-remisiones/login/'
+LOGIN_REDIRECT_URL = '/crue-remisiones/'
+LOGOUT_REDIRECT_URL = '/crue-remisiones/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
