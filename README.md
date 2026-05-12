@@ -12,6 +12,8 @@ El sistema **CRUE Remisiones Pacientes** es una aplicacion web Django que reempl
 - Importacion masiva desde Excel con validacion atomica.
 
 ## LOG
+May/12/26: r0.996 : Integrated HUDN crue_remisiones with config for testing
+
 May/07/26: r0.996 : Using a external DB. User taken from global django project. Ready for deploying as a module.
 
 May/07/26: r0.995 : changed to work with subpath: /crue-remisiones/. Before unifying to default user model.

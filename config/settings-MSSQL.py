@@ -16,11 +16,9 @@ ALLOWED_HOSTS = ["*"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost',
     'http://192.168.1.18',
     'http://172.20.10.250',
-    'http://172.20.211.163',
-    'http://172.20.209.60',
+    'http://172.20.208.155',
 ]
 
 INSTALLED_APPS = [
@@ -30,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crue_remisiones',
+    'crueremisiones',
 ]
 
 MIDDLEWARE = [
@@ -41,7 +39,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'middleware.permisos.LocalPermisosMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -68,34 +65,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 import os
 
 DATABASES = {
-    'postgres': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'crue_remisiones_db'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres2026'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    },
-
-    'mysql': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'GestorInstitucional'),
-        'USER': os.getenv('DB_USER', 'apantoja'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'ConsultasPantojaHUDN_2026$'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
-    },
-
-    'mssql': {
+    'default': {
         'ENGINE': 'mssql',
         'NAME': os.getenv('DB_DEFAULT_NAME', 'GestorInstitucional'),
         'USER': os.getenv('DB_DEFAULT_USER', 'apantoja'),
         'PASSWORD': os.getenv('DB_DEFAULT_PASSWORD', 'ConsultasPantojaHUDN_2026$'),
         'HOST': os.getenv('DB_DEFAULT_HOST', '172.20.100.209'),
-        #'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_DEFAULT_PORT', ''),
         'CONN_MAX_AGE': 600,
         'OPTIONS': {
@@ -105,9 +80,7 @@ DATABASES = {
     },
 }
 
-DATABASES ['default'] = DATABASES ['postgres']
-
-# No database router needed — single database (simulates production MSSQL)
+# No database router needed — single database (institutional MSSQL)
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -124,7 +97,7 @@ USE_TZ = False
 
 # ─── Configuration for running either: local or service  ─────────────────────────
 DEBUG = True
-LOCAL = True  # Run as python manage.py runserver instead as a service
+LOCAL = False  # Run as python manage.py runserver instead as a service
 
 USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
@@ -137,9 +110,9 @@ if LOCAL:
 	MEDIA_URL        = '/media/'
 	MEDIA_ROOT = BASE_DIR / 'media'
 	# ─── Autenticación ───────────────────────────────────────────────────────────
-	LOGIN_URL = '/crue-remisiones/login/'
-	LOGIN_REDIRECT_URL = '/crue-remisiones/'
-	LOGOUT_REDIRECT_URL = '/crue-remisiones/login/'
+	LOGIN_URL = '/login/'
+	LOGIN_REDIRECT_URL = '/'
+	LOGOUT_REDIRECT_URL = '/login/'
 else:
 	# ─── Archivos estáticos ──────────────────────────────────────────────────────
 	FORCE_SCRIPT_NAME = '/crue-remisiones'

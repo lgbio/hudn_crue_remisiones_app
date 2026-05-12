@@ -15,7 +15,7 @@ from django.contrib.auth.models import User, Group
 # ---------------------------------------------------------------------------
 # 1. Crear grupo
 # ---------------------------------------------------------------------------
-GRUPO = 'crue_remisiones'
+GRUPO = 'crue_radiooperadores'
 group, created = Group.objects.get_or_create(name=GRUPO)
 print(f"Grupo '{GRUPO}': {'creado' if created else 'ya existe'}")
 
