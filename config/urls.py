@@ -10,6 +10,7 @@ urlpatterns = [
 	path ('admin/', admin.site.urls),
 	path ('login/', authViews.LoginView.as_view (), name='login'),
 	path ('logout/', authViews.LogoutView.as_view (), name='logout'),
-    path('crue-remisiones/', include('crue_remisiones.urls')),
+	path ('', include ('crue_remisiones.urls'))
+    #path('crue-remisiones/', include('crue_remisiones.urls')),
 ]
 

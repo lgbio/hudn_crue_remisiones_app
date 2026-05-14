@@ -1,6 +1,5 @@
 # Python
 tmp/
-/static/
 
 __pycache__/
 *.py[cod]
