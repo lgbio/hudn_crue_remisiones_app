@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crue_traslados',
+    'crue_remisiones',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +71,7 @@ import os
 DATABASES = {
     'postgres': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'crue_traslados_db'),
+        'NAME': os.environ.get('DB_NAME', 'crue_remisiones_db'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres2026'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
@@ -132,7 +132,7 @@ RUNTYPE = "SERVICE"  # Run as LOCAL or as "SERVICE"
 
 if RUNTYPE == "LOCAL":
     # ─── Archivos estáticos ──────────────────────────────────────────────────────
-    #FORCE_SCRIPT_NAME = '/crue-traslados'
+    #FORCE_SCRIPT_NAME = '/crue-remisiones'
     STATIC_URL        = '/static/'
     STATIC_ROOT       = BASE_DIR / 'staticfiles'
     # ─── Archivos de medios ──────────────────────────────────────────────────────
@@ -144,15 +144,15 @@ if RUNTYPE == "LOCAL":
     LOGOUT_REDIRECT_URL = LOGIN_URL
 else:
     # ─── Archivos estáticos ──────────────────────────────────────────────────────
-    FORCE_SCRIPT_NAME = '/crue-traslados'
-    STATIC_URL        = '/crue-traslados/static/'
+    FORCE_SCRIPT_NAME = '/crue-remisiones'
+    STATIC_URL        = '/crue-remisiones/static/'
     STATIC_ROOT       = BASE_DIR / 'staticfiles'
     # ─── Archivos de medios ──────────────────────────────────────────────────────
-    MEDIA_URL        = '/crue-traslados/media/'
+    MEDIA_URL        = '/crue-remisiones/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
     # ─── Autenticación ───────────────────────────────────────────────────────────
-    LOGIN_URL           = '/crue-traslados/login/'
-    LOGIN_REDIRECT_URL  = '/crue-traslados/'
+    LOGIN_URL           = '/crue-remisiones/login/'
+    LOGIN_REDIRECT_URL  = '/crue-remisiones/'
     LOGOUT_REDIRECT_URL = LOGIN_URL
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
