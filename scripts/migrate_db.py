@@ -88,30 +88,72 @@ CONFIG_MYSQL_LOCAL = {
 }
 
 # =========================================================
-CONFIG_PG    = CONFIG_PG_HUDN
+#CONFIG_PG	  = CONFIG_PG_HUDN
+CONFIG_PG	 = CONFIG_PG_HUDN
 CONFIG_MSSQL = CONFIG_MSSQL_HUDN
 
 # =========================================================
 # EXPORT FUNCTIONS
 # =========================================================
 #-- Remove id, created_by, and, check valid dates
-def getValidValues (row):
-	print (f"\n+++ {row=}")
-	row	= row [1:-1]						  # Remove id, created_by
-	row [0]  = row [0] if row [0] else None   # Check valid dates or set to None
-	row [-3] = row [-3] if row [-3] else None
-	row [-7] = row [-7][:300]
+def getValidValues(row):
+	print(f"\n+++ {row=}")
+
+	row = row[1:-1]
+
+	# Normalize ONLY datetime fields
+	for idx in [0, -3]:
+		if pd.isna(row[idx]) or row[idx] in ("NaT", ""):
+			row[idx] = None
+
+	# Truncate text safely
+	if row[-7]:
+		row[-7] = str(row[-7])[:300]
 
 	# Convert Colombia time -> UTC
-	dt = pd.to_datetime(row[0])	
-	dt = dt.tz_convert('UTC')
-	# Remove tzinfo because MSSQL datetime is naive
-	dt = dt.tz_localize(None)
-	row[0] = dt.to_pydatetime()
+	if row[0] is not None:
+		dt = pd.to_datetime(row[0])
+		# If naive datetime, assume Colombia timezone
+		if dt.tzinfo is None:
+			dt = dt.tz_localize("America/Bogota")
 
-	print (f"\n+++ {row=}")
+		dt = dt.tz_convert("UTC")
+
+		# MSSQL datetime is naive
+		#dt = dt.tz_localize(None)
+
+		row[0] = dt.to_pydatetime()
+
+	print(f"\n>>> {row=}")
 
 	return row
+
+#def getValidValues (row):
+#	print (f"\n+++ {row=}")
+#
+#	row = row[1:-1]
+#
+#	# Normalize ONLY datetime fields
+#	if pd.isna(row[0]) or row[0] == "NaT" or row[0] == "":
+#		row[0] = None
+#
+#	if pd.isna(row[-3]) or row[-3] == "NaT" or row[-3] == "":
+#		row[-3] = None
+#
+#	# Truncate text safely
+#	if row[-7]:
+#		row[-7] = str(row[-7])[:300]
+#
+#	# Convert Colombia time -> UTC
+#	dt = pd.to_datetime(row[0])	
+#	dt = dt.tz_convert('UTC')
+#	# Remove tzinfo because MSSQL datetime is naive
+#	dt = dt.tz_localize(None)
+#	row[0] = dt.to_pydatetime()
+#
+#	print (f"\n>>> {row=}")
+#
+#	return row
 
 
 def pg_to_csv(table, csv_file):

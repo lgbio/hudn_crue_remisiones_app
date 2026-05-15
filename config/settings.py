@@ -128,7 +128,7 @@ USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
 
 DEBUG   = True
-RUNTYPE = "SERVICE"  # Run as LOCAL or as "SERVICE"
+RUNTYPE = "LOCAL"  # Run as LOCAL or as "SERVICE"
 
 if RUNTYPE == "LOCAL":
     # ─── Archivos estáticos ──────────────────────────────────────────────────────

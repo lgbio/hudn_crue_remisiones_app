@@ -37,7 +37,7 @@ def full_setup ():
 # 1. Set ENV
 # ─────────────────────────────────────────────────────────────
 def set_env_vars ():
-	os.environ['PGDATABASE']   = 'crue_remisiones_db'
+	os.environ['PGDATABASE']   = 'crue_remisiones_db2'
 	os.environ['PGHOST']	   = '127.0.0.1'
 	os.environ['PGPORT']	   = '5432'
 	os.environ['PGUSER']	   = 'postgres'
