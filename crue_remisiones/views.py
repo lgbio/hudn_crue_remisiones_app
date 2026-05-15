@@ -146,6 +146,11 @@ def remision_detail(request, pk):
     def fmt_dt(dt):
         if dt is None:
             return ''
+        # If timezone-aware, convert to local time before formatting
+        if hasattr(dt, 'tzinfo') and dt.tzinfo is not None:
+            import zoneinfo
+            local_tz = zoneinfo.ZoneInfo('America/Bogota')
+            dt = dt.astimezone(local_tz)
         return dt.strftime('%Y-%m-%dT%H:%M')
 
     data = {
