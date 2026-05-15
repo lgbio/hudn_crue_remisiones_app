@@ -221,8 +221,8 @@ function abrirModalEdicion(id) {
       limpiarErrores();
       rellenarFormulario(data);
       document.getElementById('modal-remision-id').value = id;
-      // Editable only if record is from today AND belongs to current user
-      const canEdit = data.es_editable && data.es_propio;
+      // Admin/staff can always edit; others need editable + own record
+      const canEdit = data.es_admin || (data.es_editable && data.es_propio);
       setModoModal(canEdit ? 'editar' : 'ver');
       // radio_operador is always read-only
       const radioEl = document.getElementById('id_radio_operador');

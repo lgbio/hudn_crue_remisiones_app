@@ -46,7 +46,7 @@
               data-editable="{{ remision.es_editable|yesno:'true,false' }}">
 
             <td class="col-acciones">
-              {% if remision.es_editable %}
+              {% if remision.es_editable or es_admin %}
               <button class="btn-accion btn-eliminar"
                       data-id="{{ remision.id }}"
                       title="Eliminar el registro">

@@ -120,6 +120,7 @@ def main_view(request):
         'orden': orden,
         'mes_hoy': hoy.month,
         'anio_hoy': hoy.year,
+        'es_admin': request.user.is_staff or request.user.is_superuser,
         'usuario_nombre_completo': request.user.get_full_name(),
     }
     return render(request, 'crue_remisiones/main.html', context)
@@ -176,6 +177,7 @@ def remision_detail(request, pk):
         'oportunidad': oportunidad,
         'es_editable': remision.es_editable,
         'es_propio': remision.created_by == request.user,
+        'es_admin': request.user.is_staff or request.user.is_superuser,
     }
     return JsonResponse(data)
 
@@ -183,12 +185,13 @@ def remision_detail(request, pk):
 @crue_required
 def remision_update(request, pk):
     remision = get_object_or_404(Remision, pk=pk)
+    is_admin = request.user.is_staff or request.user.is_superuser
 
-    if not es_registro_editable(remision):
-        return JsonResponse({'ok': False, 'error': 'Registro histórico: no se puede modificar.'}, status=403)
-
-    if remision.created_by != request.user:
-        return JsonResponse({'ok': False, 'error': 'Solo puede modificar sus propios registros.'}, status=403)
+    if not is_admin:
+        if not es_registro_editable(remision):
+            return JsonResponse({'ok': False, 'error': 'Registro histórico: no se puede modificar.'}, status=403)
+        if remision.created_by != request.user:
+            return JsonResponse({'ok': False, 'error': 'Solo puede modificar sus propios registros.'}, status=403)
 
     form = RemisionForm(request.POST, instance=remision)
     if form.is_valid():
@@ -201,12 +204,13 @@ def remision_update(request, pk):
 @crue_required
 def remision_delete(request, pk):
     remision = get_object_or_404(Remision, pk=pk)
+    is_admin = request.user.is_staff or request.user.is_superuser
 
-    if not es_registro_editable(remision):
-        return JsonResponse({'ok': False, 'error': 'Registro histórico: no se puede eliminar.'}, status=403)
-
-    if remision.created_by != request.user:
-        return JsonResponse({'ok': False, 'error': 'Solo puede eliminar sus propios registros.'}, status=403)
+    if not is_admin:
+        if not es_registro_editable(remision):
+            return JsonResponse({'ok': False, 'error': 'Registro histórico: no se puede eliminar.'}, status=403)
+        if remision.created_by != request.user:
+            return JsonResponse({'ok': False, 'error': 'Solo puede eliminar sus propios registros.'}, status=403)
 
     remision.delete()
     return JsonResponse({'ok': True})
