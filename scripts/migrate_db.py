@@ -30,6 +30,9 @@ python migrate_db.py csv_to_mssql remision.csv remision
 
 # Import CSV to POSTGRES
 python migrate_db.py csv_to_pg remision.csv remision
+
+# Import POSTGRES to MSSQL
+python migrate_db.py pg_to_mssql <table name>
 """
 
 import sys
@@ -155,7 +158,151 @@ def getValidValues(row):
 #
 #	return row
 
+import threading
+import psycopg2
+import pyodbc
 
+
+#-----------------------------------------------------------------------
+# Robust migration: - PostgreSQL -> MSSQL
+# - Skips existing records.  Continues on errors. Runs in background thread
+#-----------------------------------------------------------------------
+def pg_to_mssql (pg_table, mssql_table, pk_field="id", batch_size=1000):
+	print (f"+++ {pg_to_mssql=}")
+	
+	def worker():
+		print(f"+++ Starting migration {pg_table} -> {mssql_table}")
+
+		# ============================================
+		# PG CONNECT
+		# ============================================
+		pg_conn = psycopg2.connect(**CONFIG_PG)
+		pg_cur	= pg_conn.cursor()
+		pg_cur.execute(f"SELECT * FROM {pg_table}")
+		headers = [d[0] for d in pg_cur.description]
+
+		# ============================================
+		# MSSQL CONNECT
+		# ============================================
+
+		conn_str = (
+			f"DRIVER={CONFIG_MSSQL['driver']};"
+			f"SERVER={CONFIG_MSSQL['server']};"
+			f"DATABASE={CONFIG_MSSQL['database']};"
+			f"UID={CONFIG_MSSQL['user']};"
+			f"PWD={CONFIG_MSSQL['password']};"
+			f"TrustServerCertificate=yes;"
+		)
+
+		ms_conn = pyodbc.connect(conn_str)
+		ms_cur	= ms_conn.cursor()
+
+		# Faster inserts
+		ms_cur.fast_executemany = True
+
+		# ============================================
+		# EXISTING IDS
+		# ============================================
+
+		print("+++ Reading existing MSSQL IDs...")
+
+		ms_cur.execute(
+			f"SELECT {pk_field} FROM {mssql_table}"
+		)
+
+		existing_ids = set(r[0] for r in ms_cur.fetchall())
+
+		print(f"+++ Existing IDs: {len(existing_ids)}")
+
+		# ============================================
+		# INSERT SQL
+		# ============================================
+
+		cols = ",".join(headers)
+
+		placeholders = ",".join(["?"] * len(headers))
+
+		sql = f"""
+			INSERT INTO {mssql_table}
+			({cols})
+			VALUES ({placeholders})
+		"""
+
+		inserted = 0
+		skipped = 0
+		errors = 0
+
+		# ============================================
+		# PROCESS ROWS
+		# ============================================
+
+		while True:
+			rows = pg_cur.fetchmany(batch_size)
+			if not rows:
+				break
+
+			for row in rows:
+				try:
+					row_dict = dict(zip(headers, row))
+					pk		 = row_dict[pk_field]
+
+					# --------------------------------
+					# Skip existing
+					# --------------------------------
+					if pk in existing_ids:
+						skipped += 1
+						continue
+
+					# --------------------------------
+					# Insert
+					# --------------------------------
+					ms_cur.execute(sql, row)
+					inserted += 1
+					existing_ids.add(pk)
+
+					# Commit periodically
+					if inserted % 500 == 0:
+						ms_conn.commit()
+						print(
+							f"+++ inserted={inserted} "
+							f"skipped={skipped} "
+							f"errors={errors}"
+						)
+
+				except Exception as e:
+					errors += 1
+					print( f"ERROR inserting PK={pk}: {e}")
+					# rollback only current failed tx
+					ms_conn.rollback()
+					continue
+
+		# Final commit
+		ms_conn.commit()
+
+		# ============================================
+		# CLOSE
+		# ============================================
+		pg_cur.close()
+		pg_conn.close()
+
+		ms_cur.close()
+		ms_conn.close()
+
+		print("\n+++ Migration completed")
+		print(f"+++ inserted={inserted}")
+		print(f"+++ skipped={skipped}")
+		print(f"+++ errors={errors}")
+
+	# ================================================
+	# RUN IN BACKGROUND
+	# ================================================
+	#t = threading.Thread (target=worker, daemon=True)
+	#t.start()
+	worker ()
+	print("+++ Migration launched in background")
+
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
 def pg_to_csv(table, csv_file):
 	conn = psycopg2.connect(**CONFIG_PG)
 	cur = conn.cursor()
@@ -413,6 +560,11 @@ def main():
 		csv_file = sys.argv[2]
 		table = sys.argv[3]
 		csv_to_pg(csv_file, table)
+
+	elif cmd == "pg_to_mssql":
+		tablePG = sys.argv[2]
+		tableMS = sys.argv[3]
+		pg_to_mssql (tablePG, tableMS)
 
 	else:
 		print("Invalid command")

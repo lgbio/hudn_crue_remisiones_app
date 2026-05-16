@@ -161,7 +161,8 @@ def obtener_remisiones(filtro: str, **kwargs):
 	orden: 'desc' (default, newest first) or 'asc' (oldest first)
 	"""
 	orden = kwargs.pop('orden', 'desc')
-	order_field = '-fecha' if orden == 'desc' else 'fecha'
+	#order_field = '-fecha' if orden == 'desc' else 'fecha'
+	order_field = 'fecha'
 	qs = Remision.objects.all().order_by(order_field)
 
 	if filtro == 'mes':
